@@ -1,5 +1,6 @@
 PImage backgroundImage;
 boolean buttonPressed = false;
+boolean started = false;
 
 float buttonRadius;
 float buttonCenterX;
@@ -17,6 +18,8 @@ int playerOneDirection; //1 = left, 2 = up, 3 = right, 4 = down
 int playerTwoDirection;
 int speed;
 
+int startInterval = 4; // sekunde da počne igra
+float startTime;
 color b1 = color(255);
 color b2 = color(0);
 color c1 = color(204, 102, 0);
@@ -92,7 +95,24 @@ void setup() {
 }
 
 void draw() {
-  if(buttonPressed) {
+  
+  //countdown 3,2,1 prije početka igre
+    if(started) {
+      if(millis() - startTime > 1000 && startInterval >= 0) {
+            background(255);
+            text(str(startInterval - 1), width/2, (height - textWidth("0"))/2);
+            startTime = millis();
+            startInterval--;
+      }
+      if(startInterval == 0) {started = false;
+        background(255);
+        buttonPressed = true;
+      }
+    }
+  //kraj countdowna
+  
+  
+    if(buttonPressed) {
     switch(playerOneDirection) {
       case 1: {
         playerOneX--;
@@ -137,7 +157,6 @@ void draw() {
     secondPlayerPassedPoints.add(new Pair(playerTwoX, playerTwoY));
     drawAllPoints();
     
-    loadPixels();
     checkIfCollision();
     checkPlayerOutOfScreen();
        
@@ -145,6 +164,7 @@ void draw() {
 }
 
 void checkIfCollision() {
+    loadPixels();
     int pixel = get((int)playerOneX, (int)playerOneY);
     if(color(pixel) == secondPlayerColor) {
        gameOverWinnerIs(2);
@@ -183,28 +203,29 @@ void drawAllPoints() {
   fill(firstPlayerColor);
   stroke(firstPlayerColor);
   for(Pair p : firstPlayerPassedPoints) {
-      rect(p.getX(), p.getY(), 5, 5);
+      rect(p.getX(), p.getY(), 10, 10);
   }
   fill(secondPlayerColor); 
   stroke(secondPlayerColor);
   for(Pair p : secondPlayerPassedPoints) {
-    rect(p.getX(), p.getY(), 5, 5);
+    rect(p.getX(), p.getY(), 10, 10);
   }
 }
 
 void mousePressed() {
   if(overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) {
-        buttonPressed = true;
-        playerOneX = random(width);
-        playerOneY = random(height);
+        started = true;  
+        playerOneX = random(width/5, 4*width/5);
+        playerOneY = random(height/5, 4*height/5);
         firstPlayerPassedPoints.add(new Pair(playerOneX, playerOneY));
-        playerTwoX = random(width);
-        playerTwoY = random(height);
+        playerTwoX = random(width/5, 4*width/5);
+        playerTwoY = random(height/5, 4*height/5);
         secondPlayerPassedPoints.add(new Pair(playerTwoX, playerTwoY));
         playerOneDirection = (int) random(1, 4.99);
         playerTwoDirection = (int) random(1, 4.99);
+        startTime = millis();
         background(255);
-  }
+      }
 }
 
 boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)  {

@@ -149,8 +149,15 @@ void checkPlayerOutOfScreen() {
       fill(255);
       float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
       rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
-      fill(255, 0, 0);
-      text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 20);
+      fill(secondPlayerColor);
+      text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 10);
+  } else if (playerTwoX > width || playerTwoX < 0 || playerTwoY > height || playerTwoY < 0) {
+     noLoop();
+     fill(255);
+     float textWidth = textWidth("Igra završena! Pobjedio je prvi igrač!");
+     rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
+     fill(firstPlayerColor);
+     text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/2 + 10);
   }
 }
 

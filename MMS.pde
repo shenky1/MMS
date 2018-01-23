@@ -95,19 +95,19 @@ void draw() {
   if(buttonPressed) {
     switch(playerOneDirection) {
       case 1: {
-        playerOneX = playerOneX - 4;
+        playerOneX--;
         break;
       }
       case 2: {
-        playerOneY = playerOneY - 4;
+        playerOneY--;
         break;
       }
       case 3: {
-        playerOneX = playerOneX + 4;
+        playerOneX++;
         break;
       }
       case 4: {
-        playerOneY = playerOneY + 4; 
+        playerOneY++; 
         break;
       }
       default: {};      
@@ -116,19 +116,19 @@ void draw() {
 
     switch(playerTwoDirection) {
       case 1: {
-          playerTwoX = playerTwoX - 5;
+          playerTwoX--;
           break;
       }
       case 2: {
-          playerTwoY = playerTwoY - 5;
+          playerTwoY--;
           break;
       }
       case 3: {
-          playerTwoX = playerTwoX + 5;
+          playerTwoX++;
           break;
       }
       case 4: {
-          playerTwoY = playerTwoY + 5;
+          playerTwoY++;
           break;
       }
       default: {};
@@ -142,10 +142,12 @@ void draw() {
 
 void drawAllPoints() {
   fill(firstPlayerColor);
+  stroke(firstPlayerColor);
   for(Pair p : firstPlayerPassedPoints) {
       rect(p.getX(), p.getY(), 5, 5);
   }
   fill(secondPlayerColor); 
+  stroke(secondPlayerColor);
   for(Pair p : secondPlayerPassedPoints) {
     rect(p.getX(), p.getY(), 5, 5);
   }

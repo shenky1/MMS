@@ -135,30 +135,48 @@ void draw() {
     } 
     
     secondPlayerPassedPoints.add(new Pair(playerTwoX, playerTwoY));
-    
     drawAllPoints();
     
+    loadPixels();
+    checkIfCollision();
     checkPlayerOutOfScreen();
        
   }
 }
 
+void checkIfCollision() {
+    int pixel = get((int)playerOneX, (int)playerOneY);
+    if(color(pixel) == secondPlayerColor) {
+       gameOverWinnerIs(2);
+    }
+    pixel = get((int)playerTwoX, (int)playerTwoY);
+    if(color(pixel) == firstPlayerColor) {
+       gameOverWinnerIs(1);
+    }
+}
+
 void checkPlayerOutOfScreen() {
   if(playerOneX > width || playerOneX < 0 || playerOneY > height || playerOneY < 0) {
-      noLoop();
-      fill(255);
-      float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
-      rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
-      fill(secondPlayerColor);
-      text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 10);
+      gameOverWinnerIs(2);
   } else if (playerTwoX > width || playerTwoX < 0 || playerTwoY > height || playerTwoY < 0) {
-     noLoop();
-     fill(255);
+     gameOverWinnerIs(1);
+  }
+}
+
+void gameOverWinnerIs(int player) {
+   noLoop();
+   fill(255);
+   if(player == 1) {
      float textWidth = textWidth("Igra završena! Pobjedio je prvi igrač!");
      rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
      fill(firstPlayerColor);
      text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/2 + 10);
-  }
+   } else {
+     float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
+     rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
+     fill(secondPlayerColor);
+     text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 10);
+ }
 }
 
 void drawAllPoints() {

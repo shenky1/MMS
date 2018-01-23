@@ -137,6 +137,20 @@ void draw() {
     secondPlayerPassedPoints.add(new Pair(playerTwoX, playerTwoY));
     
     drawAllPoints();
+    
+    checkPlayerOutOfScreen();
+       
+  }
+}
+
+void checkPlayerOutOfScreen() {
+  if(playerOneX > width || playerOneX < 0 || playerOneY > height || playerOneY < 0) {
+      noLoop();
+      fill(255);
+      float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
+      rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
+      fill(255, 0, 0);
+      text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 20);
   }
 }
 

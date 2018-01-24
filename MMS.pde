@@ -18,12 +18,8 @@ int playerOneDirection; //1 = left, 2 = up, 3 = right, 4 = down
 int playerTwoDirection;
 int speed;
 
-Runnable lambda = new Runnable() {
-    @Override
-    public void run() {
-        
-    }
-};
+int scorePlayerOne;
+int scorePlayerTwo;
 
 int startInterval = 4; // sekunde da počne igra
 float startTime;
@@ -62,7 +58,10 @@ class Pair {
 void setup() {
     fullScreen();
     frameRate(100);
-  
+    
+    scorePlayerOne = 0;
+    scorePlayerTwo = 0;
+    
     firstPlayerPassedPoints = new ArrayList<Pair>();
     secondPlayerPassedPoints = new ArrayList<Pair>();
   
@@ -108,12 +107,12 @@ void setup() {
 }
 
 void draw() {
-  
   //countdown 3,2,1 prije početka igre
     if(started) {
+        drawSideBar();
         if(millis() - startTime > 1000 && startInterval >= 0) {
             background(255);
-            text(str(startInterval - 1), width/2, (height - textWidth("0"))/2);
+            text(str(startInterval - 1), (5*width/6)/2, (height - textWidth("0"))/2);
             startTime = millis();
             startInterval--;
         }
@@ -153,7 +152,21 @@ void draw() {
         drawAllPoints();
         checkIfCollision();
         checkPlayerOutOfScreen();
+        drawSideBar();
     }
+}
+
+void drawSideBar() {
+    fill(127, 0, 0);
+    rect(5*width/6, 0, 5, height);
+    fill(127, 0, 0);
+    text("Rezultat:", 6*width/7, height/3);
+    fill(255, 0, 0);
+    text("Igrač 1: ", 6*width/7, height/3 + 30);
+    text(scorePlayerOne, 6*width/7 + textWidth("Igrač 1: "), height/3 + 30);
+    fill(0, 0, 255);
+    text("Igrač 2: ", 6*width/7, height/3 + 60);
+    text(scorePlayerTwo, 6*width/7 + textWidth("Igrač 2: "), height/3 + 60);
 }
 
 void checkIfCollision() {
@@ -178,27 +191,40 @@ void checkIfCollision() {
 }
 
 void checkPlayerOutOfScreen() {
-    if(playerOneX > width || playerOneX < 0 || playerOneY > height || playerOneY < 0) {
+    if(playerOneX > 5*width/6 || playerOneX < 0 || playerOneY > height || playerOneY < 0) {
         gameOverWinnerIs(2);
-    } else if (playerTwoX > width || playerTwoX < 0 || playerTwoY > height || playerTwoY < 0) {
+    } else if (playerTwoX > 5*width/6 || playerTwoX < 0 || playerTwoY > height || playerTwoY < 0) {
         gameOverWinnerIs(1);
     }
 }
 
 void gameOverWinnerIs(int player) {
     noLoop();
+    background(255);
+    drawAllPoints();
     fill(255);
     if(player == 1) {
+        scorePlayerOne++;
         float textWidth = textWidth("Igra završena! Pobjedio je prvi igrač!");
-        rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
+        rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(firstPlayerColor);
-        text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/2 + 10);
+        text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/10 + 35);
     } else {
+        scorePlayerTwo++;
         float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
-        rect((width - textWidth)/2, height/2 - 20, textWidth, 40);
+        rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(secondPlayerColor);
-        text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/2 + 10);
+        text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/10 + 35);
     }
+    fill(0, 255, 0);
+    ellipseMode(RADIUS);
+    ellipse(buttonCenterX, buttonCenterY, buttonRadius, buttonRadius);
+    fill(127, 0, 0);
+    float textWidth = textWidth("Ponovo!");
+    text("Ponovo!", buttonCenterX - textWidth/2, buttonCenterY + 15);
+    buttonPressed = false;
+    drawSideBar();
+    loop();
 }
 
 void drawAllPoints() {
@@ -224,6 +250,9 @@ void mousePressed() {
         playerOneDirection = (int) random(1, 4.99);
         playerTwoDirection = (int) random(1, 4.99);
         startTime = millis();
+        startInterval = 4;
+        firstPlayerPassedPoints.clear();
+        secondPlayerPassedPoints.clear();
         background(255);
     }
 }

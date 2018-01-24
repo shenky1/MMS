@@ -157,6 +157,7 @@ void draw() {
 }
 
 void drawSideBar() {
+    text("Exit: esc", 6*width/7, height/10);
     fill(127, 0, 0);
     rect(5*width/6, 0, 5, height);
     fill(127, 0, 0);
@@ -170,16 +171,6 @@ void drawSideBar() {
 }
 
 void checkIfCollision() {
-/*    loadPixels();
-    int pixel = get((int)playerOneX, (int)playerOneY);
-    if(color(pixel) == secondPlayerColor) {
-        gameOverWinnerIs(2);
-    }
-    pixel = get((int)playerTwoX, (int)playerTwoY);
-    if(color(pixel) == firstPlayerColor) {
-        gameOverWinnerIs(1);
-    }
-*/
     Pair playerOnePos = new Pair(playerOneX, playerOneY);
     Pair playerTwoPos = new Pair(playerTwoX, playerTwoY);
     
@@ -243,9 +234,9 @@ void drawAllPoints() {
 void mousePressed() {
     if(overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) {
         started = true;  
-        playerOneX = (int)random(width/5, 4*width/5);
+        playerOneX = (int)random(width/5, 2*width/3);
         playerOneY = (int)random(height/5, 4*height/5);
-        playerTwoX = (int)random(width/5, 4*width/5);
+        playerTwoX = (int)random(width/5, 2*width/3);
         playerTwoY = (int)random(height/5, 4*height/5);
         playerOneDirection = (int) random(1, 4.99);
         playerTwoDirection = (int) random(1, 4.99);

@@ -10,6 +10,7 @@ boolean buttonPressed = false;
 boolean started = false;
 boolean frontPage = true;
 boolean blackScreen = false;
+boolean endOfGame = false;
 
 int numOfPlayers;
 int playersLeft;
@@ -434,24 +435,32 @@ void gameOverWinnerIs(int player) {
       float textWidth = textWidth("PRVI IGRAČ JE POBJEDNIK");
       fill(0);
       text("PRVI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      endCheerSound.play();
+      endOfGame = true;
     } else if(scorePlayerTwo >= numOfPointsForWin) {
       fill(secondPlayerColor);
       rect(0, 0, 5*width/6, height);
       float textWidth = textWidth("DRUGI IGRAČ JE POBJEDNIK");
       fill(0);
       text("DRUGI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      endCheerSound.play();
+      endOfGame = true;
     } else if(scorePlayerThree >= numOfPointsForWin) {
       fill(thirdPlayerColor);
       rect(0, 0, 5*width/6, height);
       float textWidth = textWidth("TREĆI IGRAČ JE POBJEDNIK");
       fill(0);
       text("TREĆI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      endCheerSound.play();
+      endOfGame = true;
     } else if(scorePlayerFour >= numOfPointsForWin) {
       fill(fourthPlayerColor);
       rect(0, 0, 5*width/6, height);
       float textWidth = textWidth("ČETVRTI IGRAČ JE POBJEDNIK");
       fill(0);
       text("ČETVRTI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      endCheerSound.play();
+      endOfGame = true;
     } else {
       fill(0, 255, 0);
       ellipseMode(RADIUS);
@@ -499,7 +508,7 @@ void drawAllPoints() {
 }
 
 void mousePressed() {
-    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
+    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!endOfGame && !buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
         startSound.close();
         started = true;  
         initializePlayersOnStart();
@@ -513,13 +522,17 @@ void mousePressed() {
         drawBackground();
         frontPage = false;
     } else if(overButton(width * 0.9, height * 0.2, 20) && !frontPage) {
-      blackScreen = true;
-      drawBackground();
-      drawAllPoints();
+      if(!endOfGame) {
+          blackScreen = true;
+          drawBackground();
+          drawAllPoints();
+      }
     } else if(overButton(width * 0.9 + 50, height * 0.2, 20) && !frontPage) {
-      blackScreen = false;
-      drawBackground();
-      drawAllPoints();
+       if(!endOfGame) {
+           blackScreen = false;
+           drawBackground();
+           drawAllPoints();
+       }
     } else  chooseNumberOfPlayers();
     
 }

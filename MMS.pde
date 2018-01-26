@@ -442,7 +442,7 @@ void drawAllPoints() {
 }
 
 void mousePressed() {
-    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
+    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
         started = true;  
         initializePlayersOnStart();
         startTime = millis();

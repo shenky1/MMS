@@ -1,10 +1,16 @@
 import ddf.minim.*;
+import g4p_controls.*;
 
 AudioPlayer crashSound; // playing and rewinding is called with method playSound(1)
 AudioPlayer cheerSound; // 2
 AudioPlayer startSound; // 
 AudioPlayer endCheerSound; //3
 Minim minim;//audio context
+
+GTextField textField1;
+GTextField textField2;
+GTextField textField3;
+GTextField textField4;
 
 boolean buttonPressed = false; // start button
 boolean started = false;  // used for countdown
@@ -40,6 +46,7 @@ color c1 = color(204, 102, 0);
 color c2 = color(0, 102, 153);
 
 class Player {
+  private String name;
   private int x;
   private int y;
   private int direction;
@@ -48,7 +55,8 @@ class Player {
   private boolean alive;
   private ArrayList<Pair> listOfPassedPoints;
  
- public Player(int x, int y, int direction, color col) {
+ public Player(String name, int x, int y, int direction, color col) {
+    this.name = name;
     this.x = x;
     this.y = y;
     this.direction = direction;
@@ -59,7 +67,15 @@ class Player {
  }
  
  public Player() { 
-   this(0, 0, 1, color(0, 0, 0));
+   this("player", 0, 0, 1, color(0, 0, 0));
+ }
+ 
+ public String getName() {
+   return name;
+ }
+ 
+ public void setName(String name) {
+    this.name = name;
  }
  
  public int getX() {
@@ -153,6 +169,10 @@ void setup() {
     playerTwo = new Player();
     playerThree = new Player();
     playerFour = new Player();
+    playerOne.setName("Igrač 1");
+    playerTwo.setName("Igrač 2");
+    playerThree.setName("Igrač 3");
+    playerFour.setName("Igrač 4");
     
     minim = new Minim(this);
     crashSound = minim.loadFile("crash.mp3");
@@ -184,21 +204,32 @@ void setup() {
   
     fill(0, 0, 120);
     textSize(50);
-    text("Igrač 1", width/7, height/4);
-    text("Igrač 2", 3*width/4, height/4);
+    text("Igrač 1", width/7, height/4);  
+    text("Igrač 2", 3*width/4, height/4);    
     text("Igrač 3", width/7, height/2);
     text("Igrač 4", 3*width/4, height/2);
     
+    
 //should allow players to choose keys
     textSize(30);
-    text("Lijevo: <-", width/7, height/4 + 50);
-    text("Desno: ->", width/7, height/4 + 100);  
-    text("Lijevo: A", 3*width/4, height/4 + 50);
-    text("Desno: D", 3*width/4, height/4 + 100);
-    text("Lijevo: J", width/7, height/2 + 50);
-    text("Desno: K", width/7, height/2 + 100);  
-    text("Lijevo: 4", 3*width/4, height/2 + 50);
-    text("Desno: 6", 3*width/4, height/2 + 100);
+    float textWidth30 = textWidth("Lijevo: A");
+    float textHeight30 = textAscent() - textDescent();
+    textField1 = new GTextField(this, width/7, height/4 + textHeight30, textWidth30, textHeight30);
+    textField1.setPromptText("Igrač 1");
+    text("Lijevo: <-", width/7, height/4 + 4*textHeight30);
+    text("Desno: ->", width/7, height/4 + 6*textHeight30);  
+    textField2 = new GTextField(this, 3*width/4, height/4 + textHeight30, textWidth30, textHeight30);
+    textField2.setPromptText("Igrač 2");
+    text("Lijevo: A", 3*width/4, height/4 + 4*textHeight30);
+    text("Desno: D", 3*width/4, height/4 + 6*textHeight30);
+    textField3 = new GTextField(this, width/7, height/2 + textHeight30, textWidth30, textHeight30);
+    textField3.setPromptText("Igrač 3");
+    text("Lijevo: J", width/7, height/2 + 4*textHeight30);
+    text("Desno: K", width/7, height/2 + 6*textHeight30);  
+    textField4 = new GTextField(this, 3*width/4, height/2 + textHeight30, textWidth30, textHeight30);
+    textField4.setPromptText("Igrač 4");
+    text("Lijevo: 4", 3*width/4, height/2 + 4*textHeight30);
+    text("Desno: 6", 3*width/4, height/2 + 6*textHeight30);
   
     textWidth = textWidth("Pravila: Upravljati svojom zmijicom i izbjegavati tragove koje ostavljaju ostale zmijice.");
     text("Pravila: Upravljati svojom zmijicom i izbjegavati tragove koje ostavljaju ostale zmijice", (width - textWidth)/2, height - 100);
@@ -341,21 +372,22 @@ void drawSideBar() {
 
     //current score
     text("Rezultat:", 6*width/7, height/3);
+    float tw = textWidth("2");
     fill(playerOne.getColor());
-    text("Igrač 1: ", 6*width/7, height/3 + 30);
-    text(playerOne.getScore(), 6*width/7 + textWidth("Igrač 1: "), height/3 + 30);
+    text(playerOne.getName() + ":", 6*width/7, height/3 + 30);
+    text(playerOne.getScore(), 6*width/7 + textWidth(playerOne.getName()) + tw, height/3 + 30);
     fill(playerTwo.getColor());
-    text("Igrač 2: ", 6*width/7, height/3 + 60);
-    text(playerTwo.getScore(), 6*width/7 + textWidth("Igrač 2: "), height/3 + 60);
+    text(playerTwo.getName() + ":", 6*width/7, height/3 + 60);
+    text(playerTwo.getScore(), 6*width/7 + textWidth(playerTwo.getName()) + tw, height/3 + 60);
     if(numOfPlayers == 3 ||numOfPlayers == 4) {
     fill(playerThree.getColor());
-    text("Igrač 3: ", 6*width/7, height/3 + 90);
-    text(playerThree.getScore(), 6*width/7 + textWidth("Igrač 3: "), height/3 + 90);
+    text(playerThree.getName() + ":", 6*width/7, height/3 + 90);
+    text(playerThree.getScore(), 6*width/7 + textWidth(playerThree.getName()) + tw, height/3 + 90);
     }
     if(numOfPlayers == 4) {
       fill(playerFour.getColor());
-      text("Igrač 4: ", 6*width/7, height/3 + 120);
-      text(playerFour.getScore(), 6*width/7 + textWidth("Igrač 4: "), height/3 + 120);
+      text(playerFour.getName() + ":", 6*width/7, height/3 + 120);
+      text(playerFour.getScore(), 6*width/7 + textWidth(playerFour.getName()) + tw, height/3 + 120);
     }
     
     //buttons for black or white screen
@@ -383,9 +415,9 @@ void checkIfCollision() {
         playersLeft--;
         playerOne.setAlive(false);
         if(playersLeft == 1) {
-          if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if(playerTwo.isAlive() && (playerFour.getListOfPassedPoints().contains(playerTwoPos) || playerThree.getListOfPassedPoints().contains(playerTwoPos) 
     ||playerOne.getListOfPassedPoints().contains(playerTwoPos) || playerTwo.getListOfPassedPoints().subList(0, playerTwo.getListOfPassedPoints().size()-1).contains(playerTwoPos))) {
@@ -394,9 +426,9 @@ void checkIfCollision() {
         playersLeft--;
         playerTwo.setAlive(false);
         if(playersLeft == 1) {
-          if(playerOne.isAlive()) gameOverWinnerIs(1);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if(playerThree.isAlive() && (numOfPlayers == 3 || numOfPlayers == 4) && (playerFour.getListOfPassedPoints().contains(playerThreePos) 
     || playerOne.getListOfPassedPoints().contains(playerThreePos) || playerTwo.getListOfPassedPoints().contains(playerThreePos) 
@@ -406,9 +438,9 @@ void checkIfCollision() {
         playersLeft--;
         playerThree.setAlive(false);
         if(playersLeft == 1) {
-          if(playerOne.isAlive()) gameOverWinnerIs(1);
-          else if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if(playerFour.isAlive() && numOfPlayers == 4 && (playerOne.getListOfPassedPoints().contains(playerFourPos) || playerTwo.getListOfPassedPoints().contains(playerFourPos)
     || playerThree.getListOfPassedPoints().contains(playerFourPos) 
@@ -418,9 +450,9 @@ void checkIfCollision() {
         playersLeft--;
         playerFour.setAlive(false);
         if(playersLeft == 1) {
-          if(playerOne.isAlive()) gameOverWinnerIs(1);
-          else if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
         }
     };
 }
@@ -445,9 +477,9 @@ void checkPlayerOutOfScreen() {
         playersLeft--;
         playerOne.setAlive(false);
         if(playersLeft == 1) {
-          if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if (playerTwo.isAlive() && (playerTwo.getX() >= 5*width/6 || playerTwo.getX() <= 0 || playerTwo.getY() >= height || playerTwo.getY() <= 0)) {
         playSound(1);
@@ -455,9 +487,9 @@ void checkPlayerOutOfScreen() {
         playersLeft--;
         playerTwo.setAlive(false);
          if(playersLeft == 1) {
-          if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if (playerThree.isAlive() && (numOfPlayers == 3 || numOfPlayers == 4) && (playerThree.getX() >= 5*width/6
     || playerThree.getX() <= 0 || playerThree.getY() >= height ||playerThree.getY() <= 0)) {
@@ -466,9 +498,9 @@ void checkPlayerOutOfScreen() {
         playersLeft--;
         playerThree.setAlive(false);
         if(playersLeft == 1) {
-          if(playerOne.isAlive()) gameOverWinnerIs(1);
-          else if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerFour.isAlive()) gameOverWinnerIs(4);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerFour.isAlive()) gameOverWinnerIs(playerFour);
         }
     } else if (playerFour.isAlive() && numOfPlayers == 4 && (playerFour.getX() >= 5*width/6 || playerFour.getX() <= 0 || playerFour.getY() >= height || playerFour.getY() <= 0)) {
         playSound(1);
@@ -476,14 +508,14 @@ void checkPlayerOutOfScreen() {
         playersLeft--;
         playerFour.setAlive(false);
         if(playersLeft == 1) {
-          if(playerOne.isAlive()) gameOverWinnerIs(1);
-          else if(playerTwo.isAlive()) gameOverWinnerIs(2);
-          else if(playerThree.isAlive()) gameOverWinnerIs(3);
+          if(playerOne.isAlive()) gameOverWinnerIs(playerOne);
+          else if(playerTwo.isAlive()) gameOverWinnerIs(playerTwo);
+          else if(playerThree.isAlive()) gameOverWinnerIs(playerThree);
         }
     }
 }
 
-void gameOverWinnerIs(int player) {
+void gameOverWinnerIs(Player player) {
     //cheer
     playSound(2);
     //hold the draw loop
@@ -491,62 +523,44 @@ void gameOverWinnerIs(int player) {
     drawBackground();
     drawAllPoints();
     fill(255);
-    if(player == 1) {
-        playerOne.setScore(playerOne.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        float textWidth = textWidth("Igra završena! Pobjedio je prvi igrač!");
-        rect((width - textWidth)/2, height/10, textWidth, 40);
-        fill(playerOne.getColor());
-        text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/10 + 35);
-    } else if(player == 2) {
-        playerTwo.setScore(playerTwo.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
-        rect((width - textWidth)/2, height/10, textWidth, 40);
-        fill(playerTwo.getColor());
-        text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/10 + 35);
-    } else if(player == 3) {
-        playerThree.setScore(playerThree.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        float textWidth = textWidth("Igra završena! Pobjedio je treći igrač!");
-        rect((width - textWidth)/2, height/10, textWidth, 40);
-        fill(playerThree.getColor());
-        text("Igra završena! Pobjedio je treći igrač!", (width - textWidth)/2, height/10 + 35);
-    } else if(player == 4) {
-        playerFour.setScore(playerFour.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        float textWidth = textWidth("Igra završena! Pobjedio je četvrti igrač!");
-        rect((width - textWidth)/2, height/10, textWidth, 40);
-        fill(playerFour.getColor());
-        text("Igra završena! Pobjedio je četvrti igrač!", (width - textWidth)/2, height/10 + 35);
-    }
+    
+    player.setScore(player.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
+    float textWidth1 = textWidth("Igra završena! Pobjedio je " + player.getName());
+    rect((width - textWidth1)/2, height/10, textWidth1, 40);
+    fill(player.getColor());
+    text("Igra završena! Pobjedio je " + player.getName(), (width - textWidth1)/2, height/10 + 35);
+    
     drawSideBar();
     if(playerOne.getScore() >= numOfPointsForWin) {
       fill(playerOne.getColor());
       rect(0, 0, 5*width/6, height);
-      float textWidth = textWidth("PRVI IGRAČ JE POBJEDNIK");
+      float textWidth = textWidth(playerOne.getName() + "je pobjednik!");
       fill(0);
-      text("PRVI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      text(playerOne.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
       endCheerSound.play();
       endOfGame = true;
     } else if(playerTwo.getScore() >= numOfPointsForWin) {
       fill(playerTwo.getColor());
       rect(0, 0, 5*width/6, height);
-      float textWidth = textWidth("DRUGI IGRAČ JE POBJEDNIK");
+      float textWidth = textWidth(playerTwo.getName() + "je pobjednik!");
       fill(0);
-      text("DRUGI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      text(playerTwo.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
       endCheerSound.play();
       endOfGame = true;
     } else if(playerThree.getScore() >= numOfPointsForWin) {
       fill(playerThree.getColor());
       rect(0, 0, 5*width/6, height);
-      float textWidth = textWidth("TREĆI IGRAČ JE POBJEDNIK");
+      float textWidth = textWidth(playerThree.getName() + "je pobjednik!");  
       fill(0);
-      text("TREĆI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      text(playerThree.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
       endCheerSound.play();
       endOfGame = true;
     } else if(playerFour.getScore() >= numOfPointsForWin) {
       fill(playerFour.getColor());
       rect(0, 0, 5*width/6, height);
-      float textWidth = textWidth("ČETVRTI IGRAČ JE POBJEDNIK");
+      float textWidth = textWidth(playerFour.getName() + "je pobjednik!");
       fill(0);
-      text("ČETVRTI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+      text(playerFour.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
       endCheerSound.play();
       endOfGame = true;
     } else {
@@ -595,8 +609,20 @@ void drawAllPoints() {
     }
 }
 
+
+
 void mousePressed() {
     if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!endOfGame && !buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
+        if(frontPage) {
+          playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText());
+          textField1.setVisible(false);
+          playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText());
+          textField2.setVisible(false);
+          playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText());
+          textField3.setVisible(false);
+          playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText());
+          textField4.setVisible(false);
+        }
         startSound.close();
         started = true;  
         initializePlayersOnStart();

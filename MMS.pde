@@ -1,4 +1,11 @@
-PImage backgroundImage;
+import ddf.minim.*;
+
+AudioPlayer crashSound;
+AudioPlayer cheerSound;
+AudioPlayer startSound;
+AudioPlayer endCheerSound;
+Minim minim;//audio context
+
 boolean buttonPressed = false;
 boolean started = false;
 boolean frontPage = true;
@@ -86,6 +93,12 @@ void setup() {
     fullScreen();
     frameRate(100);
     
+    minim = new Minim(this);
+    crashSound = minim.loadFile("crash.mp3");
+    cheerSound = minim.loadFile("cheer.mp3");
+    startSound = minim.loadFile("startMusic.mp3");
+    endCheerSound = minim.loadFile("endCheer.mp3");
+    
     scorePlayerOne = 0;
     scorePlayerTwo = 0;
     scorePlayerThree = 0;
@@ -167,6 +180,9 @@ void setup() {
     secondPlayerColor = color(0, 0, 255);
     thirdPlayerColor = color(0, 255, 0);
     fourthPlayerColor = color(255, 0, 255);
+    
+    startSound.loop();
+    
 }
 
 void draw() {
@@ -297,6 +313,8 @@ void checkIfCollision() {
     
     if(playerOneAlive && ( fourthPlayerPassedPoints.contains(playerOnePos) || thirdPlayerPassedPoints.contains(playerOnePos) ||
     secondPlayerPassedPoints.contains(playerOnePos) || firstPlayerPassedPoints.subList(0, firstPlayerPassedPoints.size()-1).contains(playerOnePos))) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerOne = scorePlayerOne + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerOneAlive = false;
@@ -305,6 +323,8 @@ void checkIfCollision() {
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);
     } else if(playerTwoAlive && (fourthPlayerPassedPoints.contains(playerTwoPos) || thirdPlayerPassedPoints.contains(playerTwoPos) 
     ||firstPlayerPassedPoints.contains(playerTwoPos) || secondPlayerPassedPoints.subList(0, secondPlayerPassedPoints.size()-1).contains(playerTwoPos))) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerTwo = scorePlayerTwo + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerTwoAlive = false;  
@@ -314,6 +334,8 @@ void checkIfCollision() {
     } else if(playerThreeAlive && (numOfPlayers == 3 || numOfPlayers == 4)
     && (fourthPlayerPassedPoints.contains(playerThreePos) || firstPlayerPassedPoints.contains(playerThreePos) || secondPlayerPassedPoints.contains(playerThreePos) 
     || thirdPlayerPassedPoints.subList(0, thirdPlayerPassedPoints.size()-1).contains(playerThreePos))) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerThree = scorePlayerThree + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerThreeAlive = false;
@@ -322,6 +344,8 @@ void checkIfCollision() {
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);
     } else if(playerFourAlive && numOfPlayers == 4 && (firstPlayerPassedPoints.contains(playerFourPos) || secondPlayerPassedPoints.contains(playerFourPos) || thirdPlayerPassedPoints.contains(playerFourPos) 
     || fourthPlayerPassedPoints.subList(0, fourthPlayerPassedPoints.size()-1).contains(playerFourPos))) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerFour = scorePlayerFour + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerFourAlive = false;
@@ -333,6 +357,8 @@ void checkIfCollision() {
 
 void checkPlayerOutOfScreen() {
     if(playerOneAlive && (playerOneX >= 5*width/6 || playerOneX <= 0 || playerOneY >= height || playerOneY <= 0)) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerOne = scorePlayerOne + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerOneAlive = false;
@@ -340,6 +366,8 @@ void checkPlayerOutOfScreen() {
         else if(playersLeft == 1 && playerThreeAlive) gameOverWinnerIs(3);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerTwoAlive && (playerTwoX >= 5*width/6 || playerTwoX <= 0 || playerTwoY >= height || playerTwoY <= 0)) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerTwo = scorePlayerTwo + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerTwoAlive = false;
@@ -347,6 +375,8 @@ void checkPlayerOutOfScreen() {
         else if(playersLeft == 1 && playerThreeAlive) gameOverWinnerIs(3);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerThreeAlive && (numOfPlayers == 3 || numOfPlayers == 4) && (playerThreeX >= 5*width/6 || playerThreeX <= 0 || playerThreeY >= height ||playerThreeY <= 0)) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerThree = scorePlayerThree + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerThreeAlive = false;
@@ -354,6 +384,8 @@ void checkPlayerOutOfScreen() {
         else if(playersLeft == 1 && playerTwoAlive) gameOverWinnerIs(2);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerFourAlive && numOfPlayers == 4 && (playerFourX >= 5*width/6 || playerFourX <= 0 || playerFourY >= height ||playerFourY <= 0)) {
+        crashSound.play();
+        crashSound.rewind();
         scorePlayerFour = scorePlayerFour + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerFourAlive = false;
@@ -364,6 +396,8 @@ void checkPlayerOutOfScreen() {
 }
 
 void gameOverWinnerIs(int player) {
+    cheerSound.play();
+    cheerSound.rewind();
     buttonPressed = false;
     drawBackground();
     drawAllPoints();
@@ -394,17 +428,40 @@ void gameOverWinnerIs(int player) {
         text("Igra završena! Pobjedio je četvrti igrač!", (width - textWidth)/2, height/10 + 35);
     }
     drawSideBar();
-    if(scorePlayerOne < numOfPointsForWin && scorePlayerTwo < numOfPointsForWin && scorePlayerThree < numOfPointsForWin && scorePlayerFour < numOfPointsForWin) {
+    if(scorePlayerOne >= numOfPointsForWin) {
+      fill(firstPlayerColor);
+      rect(0, 0, 5*width/6, height);
+      float textWidth = textWidth("PRVI IGRAČ JE POBJEDNIK");
+      fill(0);
+      text("PRVI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+    } else if(scorePlayerTwo >= numOfPointsForWin) {
+      fill(secondPlayerColor);
+      rect(0, 0, 5*width/6, height);
+      float textWidth = textWidth("DRUGI IGRAČ JE POBJEDNIK");
+      fill(0);
+      text("DRUGI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+    } else if(scorePlayerThree >= numOfPointsForWin) {
+      fill(thirdPlayerColor);
+      rect(0, 0, 5*width/6, height);
+      float textWidth = textWidth("TREĆI IGRAČ JE POBJEDNIK");
+      fill(0);
+      text("TREĆI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+    } else if(scorePlayerFour >= numOfPointsForWin) {
+      fill(fourthPlayerColor);
+      rect(0, 0, 5*width/6, height);
+      float textWidth = textWidth("ČETVRTI IGRAČ JE POBJEDNIK");
+      fill(0);
+      text("ČETVRTI IGRAČ JE POBJEDNIK", 5*width/12 - textWidth/2, height/2);
+    } else {
       fill(0, 255, 0);
       ellipseMode(RADIUS);
       ellipse(11*width/12, height*0.8, buttonRadius, buttonRadius);
       fill(127, 0, 0);
       textSize(30);
       float textWidth = textWidth("Ponovo!");
-      text("Ponovo!", 11*width/12 - textWidth/2, height*0.8 + 15);
+      text("Ponovo!", 11*width/12 - textWidth/2, height*0.8 + 15); 
     }
 }
-
 void drawBackground() {
   stroke(0);
   if(blackScreen) {
@@ -443,6 +500,7 @@ void drawAllPoints() {
 
 void mousePressed() {
     if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
+        startSound.close();
         started = true;  
         initializePlayersOnStart();
         startTime = millis();

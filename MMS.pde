@@ -2,6 +2,7 @@ PImage backgroundImage;
 boolean buttonPressed = false;
 boolean started = false;
 boolean frontPage = true;
+boolean blackScreen = false;
 
 int numOfPlayers;
 int playersLeft;
@@ -174,6 +175,7 @@ void draw() {
         drawSideBar();
         if(millis() - startTime > 1000 && startInterval >= 0) {
             background(255);
+            drawBackground();
             fill(127, 0, 0);
             text(str(startInterval - 1), (5*width/6)/2, (height - textWidth("0"))/2);
             startTime = millis();
@@ -241,7 +243,13 @@ void draw() {
         }
         fourthPlayerPassedPoints.add(new Pair(playerFourX, playerFourY));
         }
-        
+        if(blackScreen) {
+          fill(0);
+          rect(0, 0, 5*width/6, height);
+        } else {
+          fill(255);
+          rect(0, 0, 5*width/6, height);
+        }
         drawAllPoints();
         checkIfCollision();
         checkPlayerOutOfScreen();
@@ -254,6 +262,7 @@ void drawSideBar() {
     fill(127, 0, 0);
     text("Exit: esc", 6*width/7, height/10);
     rect(5*width/6, 0, 5, height);
+
     text("Rezultat:", 6*width/7, height/3);
     fill(firstPlayerColor);
     text("Igrač 1: ", 6*width/7, height/3 + 30);
@@ -271,6 +280,11 @@ void drawSideBar() {
       text("Igrač 4: ", 6*width/7, height/3 + 120);
       text(scorePlayerFour, 6*width/7 + textWidth("Igrač 4: "), height/3 + 120);
     }
+    stroke(0, 0, 0);
+    fill(255);
+    ellipse(width * 0.9 + 50, height*0.2, 20, 20);
+    fill(0, 0, 0);
+    ellipse(width * 0.9, height*0.2, 20, 20);
 }
 
 void checkIfCollision() {
@@ -342,6 +356,7 @@ void checkPlayerOutOfScreen() {
 void gameOverWinnerIs(int player) {
     noLoop();
     background(255);
+    drawBackground();
     drawAllPoints();
     fill(255);
     if(player == 1) {
@@ -383,6 +398,15 @@ void gameOverWinnerIs(int player) {
     }
 }
 
+void drawBackground() {
+  stroke(0);
+  if(blackScreen) {
+          fill(0);
+    } else {
+      fill(255);
+    }
+   rect(0, 0, 5*width/6, height);
+}
 void drawAllPoints() {
     fill(firstPlayerColor);
     stroke(firstPlayerColor);
@@ -421,8 +445,17 @@ void mousePressed() {
         thirdPlayerPassedPoints.clear();
         fourthPlayerPassedPoints.clear();
         background(255);
+        drawBackground();
         frontPage = false;
-    } else chooseNumberOfPlayers();
+    } else if(overButton(width * 0.9, height * 0.2, 20) && !frontPage) {
+      blackScreen = true;
+      drawBackground();
+      drawAllPoints();
+    } else if(overButton(width * 0.9 + 50, height * 0.2, 20) && !frontPage) {
+      blackScreen = false;
+      drawBackground();
+      drawAllPoints();
+    } else  chooseNumberOfPlayers();
     
 }
 

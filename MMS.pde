@@ -250,14 +250,16 @@ void draw() {
           fill(255);
           rect(0, 0, 5*width/6, height);
         }
+        drawSideBar();
         drawAllPoints();
         checkIfCollision();
         checkPlayerOutOfScreen();
-        drawSideBar();
     }
 }
 
 void drawSideBar() {
+    fill(255);
+    rect(5*width/6, 0, width/6, height);
     textSize(30);
     fill(127, 0, 0);
     text("Exit: esc", 6*width/7, height/10);
@@ -283,7 +285,7 @@ void drawSideBar() {
     stroke(0, 0, 0);
     fill(255);
     ellipse(width * 0.9 + 50, height*0.2, 20, 20);
-    fill(0, 0, 0);
+    fill(0);
     ellipse(width * 0.9, height*0.2, 20, 20);
 }
 
@@ -295,6 +297,7 @@ void checkIfCollision() {
     
     if(playerOneAlive && ( fourthPlayerPassedPoints.contains(playerOnePos) || thirdPlayerPassedPoints.contains(playerOnePos) ||
     secondPlayerPassedPoints.contains(playerOnePos) || firstPlayerPassedPoints.subList(0, firstPlayerPassedPoints.size()-1).contains(playerOnePos))) {
+        scorePlayerOne = scorePlayerOne + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerOneAlive = false;
         if(playersLeft == 1 && playerTwoAlive) gameOverWinnerIs(2);
@@ -302,6 +305,7 @@ void checkIfCollision() {
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);
     } else if(playerTwoAlive && (fourthPlayerPassedPoints.contains(playerTwoPos) || thirdPlayerPassedPoints.contains(playerTwoPos) 
     ||firstPlayerPassedPoints.contains(playerTwoPos) || secondPlayerPassedPoints.subList(0, secondPlayerPassedPoints.size()-1).contains(playerTwoPos))) {
+        scorePlayerTwo = scorePlayerTwo + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerTwoAlive = false;  
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
@@ -310,6 +314,7 @@ void checkIfCollision() {
     } else if(playerThreeAlive && (numOfPlayers == 3 || numOfPlayers == 4)
     && (fourthPlayerPassedPoints.contains(playerThreePos) || firstPlayerPassedPoints.contains(playerThreePos) || secondPlayerPassedPoints.contains(playerThreePos) 
     || thirdPlayerPassedPoints.subList(0, thirdPlayerPassedPoints.size()-1).contains(playerThreePos))) {
+        scorePlayerThree = scorePlayerThree + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerThreeAlive = false;
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
@@ -317,6 +322,7 @@ void checkIfCollision() {
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);
     } else if(playerFourAlive && numOfPlayers == 4 && (firstPlayerPassedPoints.contains(playerFourPos) || secondPlayerPassedPoints.contains(playerFourPos) || thirdPlayerPassedPoints.contains(playerFourPos) 
     || fourthPlayerPassedPoints.subList(0, fourthPlayerPassedPoints.size()-1).contains(playerFourPos))) {
+        scorePlayerFour = scorePlayerFour + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerFourAlive = false;
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
@@ -327,24 +333,28 @@ void checkIfCollision() {
 
 void checkPlayerOutOfScreen() {
     if(playerOneAlive && (playerOneX >= 5*width/6 || playerOneX <= 0 || playerOneY >= height || playerOneY <= 0)) {
+        scorePlayerOne = scorePlayerOne + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerOneAlive = false;
         if(playersLeft == 1 && playerTwoAlive) gameOverWinnerIs(2);
         else if(playersLeft == 1 && playerThreeAlive) gameOverWinnerIs(3);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerTwoAlive && (playerTwoX >= 5*width/6 || playerTwoX <= 0 || playerTwoY >= height || playerTwoY <= 0)) {
+        scorePlayerTwo = scorePlayerTwo + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerTwoAlive = false;
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
         else if(playersLeft == 1 && playerThreeAlive) gameOverWinnerIs(3);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerThreeAlive && (numOfPlayers == 3 || numOfPlayers == 4) && (playerThreeX >= 5*width/6 || playerThreeX <= 0 || playerThreeY >= height ||playerThreeY <= 0)) {
+        scorePlayerThree = scorePlayerThree + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerThreeAlive = false;
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
         else if(playersLeft == 1 && playerTwoAlive) gameOverWinnerIs(2);
         else if(playersLeft == 1 && playerFourAlive) gameOverWinnerIs(4);   
     } else if (playerFourAlive && numOfPlayers == 4 && (playerFourX >= 5*width/6 || playerFourX <= 0 || playerFourY >= height ||playerFourY <= 0)) {
+        scorePlayerFour = scorePlayerFour + (int)pow(2, numOfPlayers - playersLeft - 1);
         playersLeft--;
         playerFourAlive = false;
         if(playersLeft == 1 && playerOneAlive) gameOverWinnerIs(1);
@@ -354,47 +364,44 @@ void checkPlayerOutOfScreen() {
 }
 
 void gameOverWinnerIs(int player) {
-    noLoop();
-    background(255);
+    buttonPressed = false;
     drawBackground();
     drawAllPoints();
     fill(255);
     if(player == 1) {
-        scorePlayerOne++;
+        scorePlayerOne = scorePlayerOne + (int)pow(2, numOfPlayers - playersLeft - 1);
         float textWidth = textWidth("Igra završena! Pobjedio je prvi igrač!");
         rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(firstPlayerColor);
         text("Igra završena! Pobjedio je prvi igrač!", (width - textWidth)/2, height/10 + 35);
     } else if(player == 2) {
-        scorePlayerTwo++;
+        scorePlayerTwo = scorePlayerTwo + (int)pow(2, numOfPlayers - playersLeft - 1);
         float textWidth = textWidth("Igra završena! Pobjedio je drugi igrač!");
         rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(secondPlayerColor);
         text("Igra završena! Pobjedio je drugi igrač!", (width - textWidth)/2, height/10 + 35);
     } else if(player == 3) {
-        scorePlayerThree++;
+        scorePlayerThree = scorePlayerThree + (int)pow(2, numOfPlayers - playersLeft - 1);
         float textWidth = textWidth("Igra završena! Pobjedio je treći igrač!");
         rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(thirdPlayerColor);
         text("Igra završena! Pobjedio je treći igrač!", (width - textWidth)/2, height/10 + 35);
     } else if(player == 4) {
-        scorePlayerFour++;
+        scorePlayerFour = scorePlayerFour + (int)pow(2, numOfPlayers - playersLeft - 1);
         float textWidth = textWidth("Igra završena! Pobjedio je četvrti igrač!");
         rect((width - textWidth)/2, height/10, textWidth, 40);
         fill(fourthPlayerColor);
         text("Igra završena! Pobjedio je četvrti igrač!", (width - textWidth)/2, height/10 + 35);
     }
-    if(scorePlayerOne < numOfPointsForWin && scorePlayerTwo < numOfPointsForWin && scorePlayerThree < numOfPointsForWin && scorePlayerFour < numOfPointsForWin) {
-    fill(0, 255, 0);
-    ellipseMode(RADIUS);
-    ellipse(11*width/12, height*0.8, buttonRadius, buttonRadius);
-    fill(127, 0, 0);
-    textSize(30);
-    float textWidth = textWidth("Ponovo!");
-    text("Ponovo!", 11*width/12 - textWidth/2, height*0.8 + 15);
-    buttonPressed = false;
     drawSideBar();
-    loop();
+    if(scorePlayerOne < numOfPointsForWin && scorePlayerTwo < numOfPointsForWin && scorePlayerThree < numOfPointsForWin && scorePlayerFour < numOfPointsForWin) {
+      fill(0, 255, 0);
+      ellipseMode(RADIUS);
+      ellipse(11*width/12, height*0.8, buttonRadius, buttonRadius);
+      fill(127, 0, 0);
+      textSize(30);
+      float textWidth = textWidth("Ponovo!");
+      text("Ponovo!", 11*width/12 - textWidth/2, height*0.8 + 15);
     }
 }
 

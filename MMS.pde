@@ -578,7 +578,7 @@ private void drawPlayer(Player player) {
 }
 
 void mousePressed() {
-    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !buttonPressed) || (!endOfGame && !buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
+    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !started && !buttonPressed) || (!endOfGame && !buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
         if(frontPage) {
           playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText());
           textField1.setVisible(false);
@@ -589,13 +589,13 @@ void mousePressed() {
           playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText());
           textField4.setVisible(false);
           btnL1.setVisible(false);
-        btnR1.setVisible(false);
-        btnL2.setVisible(false);
-        btnR2.setVisible(false);
-        btnL3.setVisible(false);
-        btnR3.setVisible(false);
-        btnL4.setVisible(false);
-        btnR4.setVisible(false);
+          btnR1.setVisible(false);
+          btnL2.setVisible(false);
+          btnR2.setVisible(false);
+          btnL3.setVisible(false);
+          btnR3.setVisible(false);
+          btnL4.setVisible(false);
+          btnR4.setVisible(false);
         }
         startSound.close();
         started = true;  
@@ -608,15 +608,6 @@ void mousePressed() {
         startInterval = secondsToStart;
         drawBackground(blackScreen);
         frontPage = false;
-        btnL1.setEnabled(false);
-        btnR1.setEnabled(false);
-        btnL2.setEnabled(false);
-        btnR2.setEnabled(false);
-        btnL3.setEnabled(false);
-        btnR3.setEnabled(false);
-        btnL4.setEnabled(false);
-        btnR4.setEnabled(false);
-
     } else if(overButton(width * 0.9, height * 0.2, 20) && !frontPage) {
       if(!endOfGame) {
           blackScreen = true;
@@ -634,31 +625,26 @@ void mousePressed() {
 }
 
 void initializePlayersOnStart() {
-        playerOne.setAlive(true);
-        playerTwo.setAlive(true);
-        playerOne.setX((int)random(width/5, 2*width/3));
-        playerOne.setY((int)random(height/5, 4*height/5));
-        playerTwo.setX((int)random(width/5, 2*width/3));
-        playerTwo.setY((int)random(height/5, 4*height/5));
+        initializePlayer(playerOne);
+        initializePlayer(playerTwo);
         if(numOfPlayers == 3 || numOfPlayers == 4) {
-            playerThree.setX((int)random(width/5, 2*width/3));
-            playerThree.setY((int)random(height/5, 4*height/5));
-            playerThree.setDirection((int) random(1, 4.99));
-            playerThree.setAlive(true);
+            initializePlayer(playerThree);
         }
         if(numOfPlayers == 4) {
-          playerFour.setX((int)random(width/5, 2*width/3));
-          playerFour.setY((int)random(height/5, 4*height/5));
-          playerFour.setDirection((int) random(1, 4.99));
-          playerFour.setAlive(true);
+          initializePlayer(playerFour);
         }
         playersLeft = numOfPlayers;
-        playerOne.setDirection((int) random(1, 4.99));
-        playerTwo.setDirection((int) random(1, 4.99)); 
 }
 
+private void initializePlayer(Player player) {
+        player.setAlive(true);
+        player.setDirection((int) random(1, 4.99));
+        player.setX((int)random(width/5, 2*width/3));
+        player.setY((int)random(height/5, 4*height/5));
+} 
+
 void chooseNumberOfPlayers() {
- if(overButton((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius)) {
+ if(overButton((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
       fill(0, 255, 0);
       ellipse((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
       fill(255, 0, 0);
@@ -667,7 +653,7 @@ void chooseNumberOfPlayers() {
       writeTexts();
       numOfPlayers = 3;
       playersLeft = 3;
-    } else if(overButton((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius)) {
+    } else if(overButton((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
       fill(0, 255, 0);
       ellipse((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
       fill(255, 0, 0);
@@ -676,7 +662,7 @@ void chooseNumberOfPlayers() {
       writeTexts();
       numOfPlayers = 4;
       playersLeft = 4;
-    } else if(overButton((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius)) {
+    } else if(overButton((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
       fill(0, 255, 0);
       ellipse((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
       fill(255, 0, 0);

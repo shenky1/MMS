@@ -7,36 +7,17 @@ AudioPlayer startSound; //
 AudioPlayer endCheerSound; //3
 Minim minim;//audio context
 
-//choosing names
-GTextField textField1;
-GTextField textField2;
-GTextField textField3;
-GTextField textField4;
-
-//choosing keys
-GButton btnL1;
-GButton btnR1;
-GButton btnL2;
-GButton btnR2;
-GButton btnL3;
-GButton btnR3;
-GButton btnL4;
-GButton btnR4;
-
-boolean buttonPressed = false; // start button
-boolean started = false;  // used for countdown
+boolean startRound = false; // start button
+boolean startCounter = false;  // used for countdown
 boolean frontPage = true; // am I on front page
 boolean blackScreen = false; // do I want black board or white
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
 
 int numOfPlayers; // starting number of players
 int playersLeft; // how many players are alive at any time during the game
+int rectangleSize = 2;
 
 int numOfPointsForWin = 10; //final number of points to win
-
-float buttonRadius;
-float buttonCenterX;
-float buttonCenterY;
 
 Player playerOne;
 Player playerTwo;
@@ -44,9 +25,6 @@ Player playerThree;
 Player playerFour;
 
 ArrayList<Player> listOfPlayers;
-
-float numOfPlayersWidth; // width of string "Number of players: " used for positioning buttons on start screen.. Global because choosing a player is pressing button event  
-float numOfPlayersRadius; //radius of buttons depends on width... Bad implementation
 
 int secondsToStart = 4; // one bigger than it really is
 int startInterval; // counter 
@@ -58,188 +36,56 @@ color b2 = color(0);
 color c1 = color(204, 102, 0);
 color c2 = color(0, 102, 153);
 
-class Player {
-  private String name;
-  private int x;
-  private int y;
-  private int direction;
-  private color col;
-  private int score;
-  private boolean alive;
-  private ArrayList<Pair> listOfPassedPoints;
-  private char left;
-  private char right;
-//  private int leftCoded;
-//  private int rightCoded;
-  
- public Player(String name, int x, int y, int direction, color col) {
-    this.name = name;
-    this.x = x;
-    this.y = y;
-    this.direction = direction;
-    this.col = col;
-    score = 0;
-    alive = false;
-    listOfPassedPoints = new ArrayList<Pair>();
- }
- 
- public Player(char left, char right) { 
-   this("player", 0, 0, 1, color(0, 0, 0));
-   this.left = left;
-   this.right = right;
- }
- 
- /*public Player(int leftCoded, int rightCoded) {
-   this((char)0, (char)0);
-   this.leftCoded = leftCoded;
-   this.rightCoded = rightCoded;
- }
- */
- 
- public String getName() {
-   return name;
- }
- 
- public void setName(String name) {
-    this.name = name;
- }
- 
- public int getX() {
-   return x;
- }
- 
- public int getY() {
-   return y;
- }
- 
- public void setX(int x) {
-   this.x = x;
- }
- 
- public void setY(int y) {
-   this.y = y;
- }
- 
- public int getDirection(){
-   return direction;
- }
- 
- public void setDirection(int direction) {
-   this.direction = direction;
- }
- 
- public color getColor() {
-   return col;
- }
- 
- public void setColor(color col) {
-   this.col = col;
- }
- 
-  public int getScore() {
-    return score;
-  }
-  
-  public void setScore(int score) {
-    this.score = score;
-  }
-  
-  public boolean isAlive() {
-    return alive;
-  }
-  
-  public void setAlive(boolean alive) {
-    this.alive = alive;
-  }
-  
-  public void updateList(Pair p) {
-     listOfPassedPoints.add(p);
-  }
-  
-  public ArrayList<Pair> getListOfPassedPoints() {
-    return listOfPassedPoints;
-  }
-  
-  public char getLeft() {
-    return left;
-  }
-  
-  public void setLeft(char c) {
-    this.left = c;
-  }
-  
-  public char getRight() {
-    return right;
-  }
-  
-  public void setRight(char c) {
-    this.right = c;
-  }
-  
- /*   public int getLeftCoded() {
-    return leftCoded;
-  }
-  
-  public void setLeftCoded(int c) {
-    this.leftCoded = c;
-  }
-  
-  public int getRightCoded() {
-    return rightCoded;
-  }
-  
-  public void setRightCoded(int c) {
-    this.rightCoded = c;
-  }
-  */
-}
+//choosing names
+GTextField textField1;
+GTextField textField2;
+GTextField textField3;
+GTextField textField4;
 
-//Java has its own implementation of pair.. Should change
-class Pair {
-    private int x;
-    private int y;
-  
-    public Pair(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-  
-    public int getX() {
-        return x;
-    }
-  
-    public int getY() {
-        return y;
-    }
-  
-    @Override
-    public boolean equals(Object p) {
-      if(x == ((Pair)p).getX() && y == ((Pair)p).getY()) return true;
-      return false;
-    }
-}
+GButton btnL1;
+GButton btnR1;
+GButton btnL2;
+GButton btnR2;
+GButton btnL3;
+GButton btnR3;
+GButton btnL4;
+GButton btnR4;
 
+GButton btn2Players;
+GButton btn3Players;
+GButton btn4Players;
+
+GButton btnStart;
+
+GButton btnChooseColor1;
+GButton btnChooseColor2;
+GButton btnChooseColor3;
+GButton btnChooseColor4;
+
+int numOfButtons = 16;
+
+GButton[] buttons = {btnL1, btnL2, btnL3, btnL4, btnR1, btnR2, btnR3, btnR4,
+                      btn2Players, btn3Players, btn4Players, btnStart,
+                      btnChooseColor1, btnChooseColor2, btnChooseColor3, btnChooseColor4};
 
 void setup() {
     fullScreen();
-    frameRate(200);
+    frameRate(100);
     
-    playerOne = new Player((char)49, (char)51); // 1, 3
-    playerTwo = new Player((char)65,(char)68); // A, D
-    playerThree = new Player((char)74,(char)76); // J, L
-    playerFour = new Player((char)52,(char)54); // 4, 6
+    playerOne = new Player((char)49, (char)51, color(255, 0, 0)); // 1, 3
+    playerTwo = new Player((char)65,(char)68, color(0, 0, 255)); // A, D
+    playerThree = new Player((char)74,(char)76, color(0, 255, 0)); // J, L
+    playerFour = new Player((char)52,(char)54, color(255, 0, 255)); // 4, 6
 
     listOfPlayers = new ArrayList<Player>();
     listOfPlayers.add(playerOne);
     listOfPlayers.add(playerTwo);
-    listOfPlayers.add(playerThree);
-    listOfPlayers.add(playerFour);
     
     minim = new Minim(this);
     crashSound = minim.loadFile("crash.mp3");
     cheerSound = minim.loadFile("cheer.mp3");
     startSound = minim.loadFile("startMusic.mp3");
-    endCheerSound = minim.loadFile("endCheer.mp3");
+    endCheerSound = minim.loadFile("endCheer.mp3");    
  
     //initial number of players
     numOfPlayers = 2;
@@ -248,122 +94,138 @@ void setup() {
     setGradient(0, 0, width/2, height, b1, b2, 2);
     setGradient(width/2, 0, width/2, height, b2, b1, 2); 
     
-    //startButton
-    buttonRadius = width/20;
-    buttonCenterX = width/2;
-    buttonCenterY = 3*height/7;
-    fill(0, 255, 0);
-    ellipseMode(RADIUS);
-    ellipse(buttonCenterX, buttonCenterY, buttonRadius, buttonRadius);
+
+    int buttonRadius = width/15;
+    btnStart = new GButton(this, (width - buttonRadius)/2, 3*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "START");
+    btnStart.setLocalColor(4, color(0, 255, 0));
+    
 
     PFont startPageFont = createFont("CaviarDreams_Bold.ttf", 60);
     textFont(startPageFont);
     fill(0, 0, 255);
-    textSize(60);
-    float textWidth = textWidth("Pazi krivulja!");
-    text("Pazi krivulja!", (width - textWidth)/2, height/6);
+    
+    textSize(titleSize);
+    float titleWidth = textWidth(title);
+    text(title, (width - titleWidth)/2, height/6);
   
     fill(0, 0, 120);
-    textSize(50);
-    text("Igrač 1", width/7, height/4);  
-    text("Igrač 2", 3*width/4, height/4);    
-    text("Igrač 3", width/7, height/2);
-    text("Igrač 4", 3*width/4, height/2);
+    textSize(playerSize);
+    text(player + " 1", width/7, height/4);  
+    text(player + " 2", 3*width/4, height/4);    
+    text(player + " 3", width/7, height/2);
+    text(player + " 4", 3*width/4, height/2);
     
     
     
-    textSize(30);
-    float textWidth30 = textWidth("Lijevo: A");
-    float textHeight30 = textAscent() - textDescent();
-    textField1 = new GTextField(this, width/7, height/4 + textHeight30, textWidth30, textHeight30);
-    textField1.setPromptText("Igrač 1");
-    text("Lijevo: ", width/7, height/4 + 4*textHeight30);
-    text("Desno: ", width/7, height/4 + 6*textHeight30);  
-    textField2 = new GTextField(this, 3*width/4, height/4 + textHeight30, textWidth30, textHeight30);
-    textField2.setPromptText("Igrač 2");
-    text("Lijevo: ", 3*width/4, height/4 + 4*textHeight30);
-    text("Desno: ", 3*width/4, height/4 + 6*textHeight30);
-    textField3 = new GTextField(this, width/7, height/2 + textHeight30, textWidth30, textHeight30);
-    textField3.setPromptText("Igrač 3");
-    text("Lijevo: ", width/7, height/2 + 4*textHeight30);
-    text("Desno: ", width/7, height/2 + 6*textHeight30);  
-    textField4 = new GTextField(this, 3*width/4, height/2 + textHeight30, textWidth30, textHeight30);
-    textField4.setPromptText("Igrač 4");
-    text("Lijevo: ", 3*width/4, height/2 + 4*textHeight30);
-    text("Desno: ", 3*width/4, height/2 + 6*textHeight30);
+    textSize(nameSize);
+    float chooseColorWidth = textWidth(chooseColor);
+    float chooseColorHeight = textAscent() - textDescent();
+    textField1 = new GTextField(this, width/7, height/4 + chooseColorHeight, chooseColorWidth, chooseColorHeight);
+    textField1.setPromptText(player + "1");
+    text(left, width/7, height/4 + 4*chooseColorHeight);
+    text(right, width/7, height/4 + 6*chooseColorHeight);  
+    text(chooseColor, width/7, height/4 + 8*chooseColorHeight);
+    textField2 = new GTextField(this, 3*width/4, height/4 + chooseColorHeight, chooseColorWidth, chooseColorHeight);
+    textField2.setPromptText(player + "2");
+    text(left, 3*width/4, height/4 + 4*chooseColorHeight);
+    text(right, 3*width/4, height/4 + 6*chooseColorHeight);
+    text(chooseColor, 3*width/4, height/4 + 8*chooseColorHeight);
+    textField3 = new GTextField(this, width/7, height/2 + chooseColorHeight, chooseColorWidth, chooseColorHeight);
+    textField3.setPromptText(player + "3");
+    text(left, width/7, height/2 + 4*chooseColorHeight);
+    text(right, width/7, height/2 + 6*chooseColorHeight);  
+    text(chooseColor, width/7, height/2 + 8*chooseColorHeight);
+    textField4 = new GTextField(this, 3*width/4, height/2 + chooseColorHeight, chooseColorWidth, chooseColorHeight);
+    textField4.setPromptText(player + "4");
+    text(left, 3*width/4, height/2 + 4*chooseColorHeight);
+    text(right, 3*width/4, height/2 + 6*chooseColorHeight);    
+    text(chooseColor, 3*width/4, height/2 + 8*chooseColorHeight);
+
   
   //button for players to choose keys
-    btnL1 = new GButton(this, width/7 + textWidth30, height/4 + 3*textHeight30, 60, 30, "1");
-    btnR1 = new GButton(this, width/7 + textWidth30, height/4 + 5*textHeight30, 60, 30, "3");
-    btnL2 = new GButton(this, 3*width/4 + textWidth30, height/4 + 3*textHeight30, 60, 30, "A");
-    btnR2 = new GButton(this, 3*width/4 + textWidth30, height/4 + 5*textHeight30, 60, 30, "D"); 
-    btnL3 = new GButton(this, width/7 + textWidth30, height/2 + 3*textHeight30, 60, 30, "J");
-    btnR3 = new GButton(this, width/7 + textWidth30, height/2 + 5*textHeight30, 60, 30, "L"); 
-    btnL4 = new GButton(this, 3*width/4 + textWidth30, height/2 + 3*textHeight30, 60, 30, "4");
-    btnR4 = new GButton(this, 3*width/4 + textWidth30, height/2 + 5*textHeight30, 60, 30, "6");
+    btnL1 = new GButton(this, width/7 + chooseColorWidth, height/4 + 3*chooseColorHeight, playerSize, playerSize, "1");
+    btnR1 = new GButton(this, width/7 + chooseColorWidth, height/4 + 5*chooseColorHeight, 60, 30, "3");
+    btnChooseColor1 = new GButton(this, width/7 + chooseColorWidth, height/4 + 7*chooseColorHeight, 60, 30, col);
+    btnL2 = new GButton(this, 3*width/4 + chooseColorWidth, height/4 + 3*chooseColorHeight, 60, 30, "A");
+    btnR2 = new GButton(this, 3*width/4 + chooseColorWidth, height/4 + 5*chooseColorHeight, 60, 30, "D"); 
+    btnChooseColor2 = new GButton(this, 3*width/4 + chooseColorWidth, height/4 + 7*chooseColorHeight, 60, 30, col);   
+    btnL3 = new GButton(this, width/7 + chooseColorWidth, height/2 + 3*chooseColorHeight, 60, 30, "J");
+    btnR3 = new GButton(this, width/7 + chooseColorWidth, height/2 + 5*chooseColorHeight, 60, 30, "L"); 
+    btnChooseColor3 = new GButton(this, width/7 + chooseColorWidth, height/2 + 7*chooseColorHeight, 60, 30, col); 
+    btnL4 = new GButton(this, 3*width/4 + chooseColorWidth, height/2 + 3*chooseColorHeight, 60, 30, "4");
+    btnR4 = new GButton(this, 3*width/4 + chooseColorWidth, height/2 + 5*chooseColorHeight, 60, 30, "6");   
+    btnChooseColor4 = new GButton(this, 3*width/4 + chooseColorWidth, height/2 + 7*chooseColorHeight, 60, 30, col);
 
-
-    textWidth = textWidth("Pravila: Upravljati svojom zmijicom i izbjegavati tragove koje ostavljaju ostale zmijice.");
-    text("Pravila: Upravljati svojom zmijicom i izbjegavati tragove koje ostavljaju ostale zmijice.", (width - textWidth)/2, height - 100);
-    textWidth = textWidth("Pobjednik je igrač koji duže preživi. Prvi igrač do 10 bodova pobjeđuje.");
-    text("Pobjednik je igrač koji duže preživi. Prvi igrač do 10 bodova pobjeđuje.", (width - textWidth)/2, height - 50);
-    
-    fill(127, 0, 0);
-    textWidth = textWidth("START");
-    text("START", buttonCenterX - textWidth/2, buttonCenterY + 15);
+    float ruleWidth = textWidth(rule1);
+    text(rule1, (width - ruleWidth)/2, height - 100);
+    ruleWidth = textWidth(rule2);
+    text(rule2, (width - ruleWidth)/2, height - 50);
     
     //positioning circles change to GButton
     fill(255, 0, 0);
-    numOfPlayersWidth = textWidth("Odaberite broj igrača: ");
-    text("Odaberite broj igrača: ", (width - numOfPlayersWidth)/2, height * 0.62);
-    numOfPlayersRadius = (numOfPlayersWidth - 20)/6;
-    ellipse((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-    ellipse((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-    ellipse((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
+    textSize(playerSize);
+    float numOfPlayersWidth = textWidth(chooseNumOfPlayers);
+    text(chooseNumOfPlayers, (width - numOfPlayersWidth)/2, height * 0.62);
+    float numOfPlayersRadius = (numOfPlayersWidth - 100)/3;
     
-    //positioning number 2,3,4 in the center of circles
-    textSize(40);
-    fill(0, 0, 255);
-    text("2", (width - numOfPlayersWidth - textWidth("2"))/2 + numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-    text("3", (width - numOfPlayersWidth - textWidth("3"))/2 + 10 + 3*numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-    text("4", (width - numOfPlayersWidth - textWidth("4"))/2 + 20 + 5*numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-  
-    playerOne.setColor(color(255, 0, 0));
-    playerTwo.setColor(color(0, 0, 255));
-    playerThree.setColor(color(0, 255, 0));
-    playerFour.setColor(color(255, 0, 255));
-    
+    btn2Players = new GButton(this, (width - numOfPlayersWidth)/2 , 3*height/4 - numOfPlayersRadius/2, numOfPlayersRadius, numOfPlayersRadius, "2"); 
+    btn3Players = new GButton(this, (width - numOfPlayersWidth)/2 + 50 + numOfPlayersRadius, 3*height/4 - numOfPlayersRadius/2, numOfPlayersRadius, numOfPlayersRadius, "3");
+    btn4Players = new GButton(this, (width - numOfPlayersWidth)/2 + 100 + 2*numOfPlayersRadius, 3*height/4 - numOfPlayersRadius/2, numOfPlayersRadius, numOfPlayersRadius, "4");
+    btn2Players.setLocalColor(4, color(255, 0, 0));
+    btn3Players.setLocalColor(4, color(255, 0, 0));
+    btn4Players.setLocalColor(4, color(255, 0, 0));
+    btn2Players.setLocalColor(3, color(0, 0, 255));
+    btn3Players.setLocalColor(3, color(0, 0, 255));
+    btn4Players.setLocalColor(3, color(0, 0, 255));
+    btnChooseColor1.setLocalColor(4, playerOne.getColor());
+    btnChooseColor2.setLocalColor(4, playerTwo.getColor());
+    btnChooseColor3.setLocalColor(4, playerThree.getColor());
+    btnChooseColor4.setLocalColor(4, playerFour.getColor());
+
+
     //looping but not well.. Not continuous
     startSound.loop();
+    
     
 }
 
 void draw() {
   //countdown before each round starts
-    if(started) {
+    if(startCounter) {
         startCountdown();
     }
   //end of countdown
   
-    if(buttonPressed) {
-      //move each player if he is alive based on his direction and adding current position in the list of passed points
-        ifAliveMove(playerOne);
-        ifAliveMove(playerTwo);
-        ifAliveMove(playerThree);
-        ifAliveMove(playerFour);
-        
-        //changing screen black or white
-        drawBackground(blackScreen);
-        
+    if(startRound) {
+      
         drawSideBar();
-        drawAllPoints();
-        checkIfCollision();
+        for(Player p : listOfPlayers) 
+            if(p.isAlive()) { 
+                Move(p);
+                checkIfCollision(p);
+            }        
+        
+        drawAllPlayersCurrentPositions();
     }
+    
+    if(showColorPicker) {      
+        drawColorPicker();
+        drawLine();
+        drawCross();
+        drawActiveColor();
+        drawValues();
+        drawOK();   
+        activeColor = color( LineY - ColorPickerY , CrossX - ColorPickerX , 255 - ( CrossY - ColorPickerY ) ); //set current active color
+
+      }
+      
+  checkMouse();
 }
 
 private void startCountdown() {
         drawSideBar();
         if(millis() - startTime > 1000 && startInterval >= 0) {
+            background(255);
             drawBackground(blackScreen);
             fill(127, 0, 0);
             text(str(startInterval - 1), (5*width/6)/2, (height - textWidth("0"))/2);
@@ -372,25 +234,24 @@ private void startCountdown() {
         }
       
         if(startInterval == 0) {
-            started = false;
-            background(255);
-            buttonPressed = true;
-        } 
+            startCounter = false;
+            drawBackground(blackScreen);
+            startRound = true;
+        }
 }
 
-private void ifAliveMove(Player player) {
+private void Move(Player player) {
     if(player.isAlive()) {  
       switch(player.getDirection()) {
-        case 1: player.setX(player.getX() - 1);
+        case 1: player.setX(player.getX() - rectangleSize);
                 break;
-        case 2: player.setY(player.getY() - 1);
+        case 2: player.setY(player.getY() - rectangleSize);
                 break;
-        case 3: player.setX(player.getX() + 1);
+        case 3: player.setX(player.getX() + rectangleSize);
                 break;
-        case 4: player.setY(player.getY() + 1); 
+        case 4: player.setY(player.getY() + rectangleSize); 
                 break;    
       }
-      player.updateList(new Pair(player.getX(), player.getY())); 
     }
 }
 
@@ -398,13 +259,12 @@ private void ifAliveMove(Player player) {
 private void drawSideBar() {
     //white rectangle first
     fill(255);
-    rect(5*width/6, 0, width/6, height);
+    rect(5*width/6, 0, width, height);
     
     //information about exit
     textSize(30);
     fill(127, 0, 0);
     text("Exit: esc", 6*width/7, height/10);
-    rect(5*width/6, 0, 5, height);
 
     //current score
     text("Rezultat:", 6*width/7, height/3);
@@ -432,38 +292,29 @@ private void drawPlayerScore(Player player, int distance) {
     text(player.getScore(), 6*width/7 + textWidth(player.getName()) + tw, height/3 + distance);
 }
 
-private boolean hasCrashedIntoOtherPlayer(Player player) {
-   for(Player p : listOfPlayers) {
-     if(player != p && p.getListOfPassedPoints().contains(new Pair(player.getX(), player.getY()))) return true;
-   }
-     return false;
-}
+private boolean hasCrashed(Player player) {
+      rectMode(CORNERS);
 
-private boolean hasCrashedIntoSelf(Player player) {
-    Pair p = new Pair(player.getX(), player.getY());
-    if(player.getListOfPassedPoints().subList(0, player.getListOfPassedPoints().size()-1).contains(p)) return true;
-    return false;
-}
-
-void checkIfCollision() {
-    checkIfCollision(playerOne);
-    checkIfCollision(playerTwo);
-    checkIfCollision(playerThree);
-    checkIfCollision(playerFour);
-    checkPlayerOutOfScreen(playerOne);
-    checkPlayerOutOfScreen(playerTwo);
-    checkPlayerOutOfScreen(playerThree);
-    checkPlayerOutOfScreen(playerFour);
+  for(int i = 0; i < rectangleSize; ++i) {
+      for(int j = 0; j < rectangleSize; ++j) {
+          color col = get(i + player.getX(), j + player.getY());
+          if(col != color(255) && col != color(0)) return true;
+      }
+  }
+   return false;
 }
 
 private void checkIfCollision(Player player) {
-   if(player.isAlive() && (hasCrashedIntoOtherPlayer(player) || hasCrashedIntoSelf(player))) {
-        //if crash play crash sound
-        playSound(1);
+   if(player.isAlive() && (isPlayerOutOfScreen(player) || hasCrashed(player))) {
+        playSound(Sound.CRASH);
+               
+                
         // if first to die get 0 points, if second to die get 1 point etc (exponents of number 2).. If n players were in the game winner of round wins 2^(n-2) points
-        player.setScore(player.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        playersLeft--;
+        int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
+        player.setScore(player.getScore() + pointsWon);
         player.setAlive(false);
+
+        playersLeft--;
         if(playersLeft == 1) {
           for(Player p : listOfPlayers) {
             if(player != p && p.isAlive()) announceRoundWinner(p);
@@ -472,51 +323,73 @@ private void checkIfCollision(Player player) {
     }
 }
 
-void playSound(int n) {
-  if(n == 1) {
-    crashSound.play();
-    crashSound.rewind();
-  } else if(n == 2) {
-    cheerSound.play();
-    cheerSound.rewind();
-  } else if(n == 3) {
-    endCheerSound.play();
-  }
-}
-
-
-void checkPlayerOutOfScreen(Player player) {
-  //for each player check the boundaries play sound, increase the score, kill the player who crosses the boundaries, if it is the last player to die announce the winner
-    if(player.isAlive() && (player.getX() >= 5*width/6 || player.getX() <= 0 || player.getY() >= height || player.getY() <= 0)) {
-        playSound(1);
-        player.setScore(player.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
-        playersLeft--;
-        player.setAlive(false);
-        if(playersLeft == 1) {
-         for(Player p : listOfPlayers) {
-            if(player != p && p.isAlive()) announceRoundWinner(p);
-          }
-        }
+private boolean isPlayerOutOfScreen(Player player) {
+    if(player.getX() >= 5*width/6 || player.getX() <= 0 || player.getY() >= height || player.getY() <= 0) {
+        return true;
     }
+    return false;
 }
 
 private void announceRoundWinner(Player player) {
-    playSound(2);
-    buttonPressed = false;
+    playSound(Sound.CHEER);
+    startRound = false;
     drawBackground(blackScreen);
-    drawAllPoints();
+    
+    for(Player p : listOfPlayers) {
+        drawWholePath(p);
+    }
+    
     fill(255);
-    player.setScore(player.getScore() + (int)pow(2, numOfPlayers - playersLeft - 1));
+    int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
+    player.setScore(player.getScore() + pointsWon);
     float textWidth1 = textWidth("Igra završena! Pobjedio je " + player.getName());
-    rect((width - textWidth1)/2, height/10, textWidth1, 40);
+    rect((width - textWidth1)/2, height/10, (width - textWidth1)/2 + textWidth1, height/10 + 40);
     fill(player.getColor());
     text("Igra završena! Pobjedio je " + player.getName(), (width - textWidth1)/2, height/10 + 35); 
     drawSideBar();
     checkIfGameOver();
 }
 
+void drawAllPlayersCurrentPositions() {
+    for(Player p : listOfPlayers) {
+      if(p.isAlive()) drawPlayersCurrentPosition(p);
+    }
+}
+
+private void drawPlayersCurrentPosition(Player player) {
+      fill(player.getColor());
+      stroke(player.getColor());
+      rect(player.getX(), player.getY(), player.getX() + rectangleSize - 1, player.getY() + rectangleSize - 1);
+      player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
+}
+
+private void drawWholePath(Player player) {
+   ArrayList<Pair> passedPoints = player.getListOfPassedPoints();
+   fill(player.getColor());
+   stroke(player.getColor());
+   for(Pair p : passedPoints) {
+       rect(p.getX(), p.getY(), p.getX() + rectangleSize - 1, p.getY() + rectangleSize - 1);
+   }
+}
+
+enum Sound {
+  CRASH, CHEER, END_CHEER, START;
+}
+
+void playSound(Sound sound) {
+  if(sound == Sound.CRASH) {
+    crashSound.play();
+    crashSound.rewind();
+  } else if(sound == Sound.CHEER) {
+    cheerSound.play();
+    cheerSound.rewind();
+  } else if(sound == Sound.END_CHEER) {
+    endCheerSound.play();
+  }
+}
+
 private void checkIfGameOver() {
-  if(playerOne.getScore() >= numOfPointsForWin) {
+    if(playerOne.getScore() >= numOfPointsForWin) {
       announceFinalWinner(playerOne);
     } else if(playerTwo.getScore() >= numOfPointsForWin) {
       announceFinalWinner(playerTwo);
@@ -530,9 +403,9 @@ private void checkIfGameOver() {
 }
 
 private void drawAgainButton() {
-      fill(0, 255, 0);
+      fill(0, 255, 0); //<>//
       ellipseMode(RADIUS);
-      ellipse(11*width/12, height*0.8, buttonRadius, buttonRadius);
+      ellipse(11*width/12, height*0.8, width/20, width/20);
       fill(127, 0, 0);
       textSize(30);
       float textWidth = textWidth("Ponovo!");
@@ -558,47 +431,13 @@ void drawBackground(boolean blackScreen) {
    rect(0, 0, 5*width/6, height);
 }
 
-void drawAllPoints() {
-    drawPlayer(playerOne);
-    drawPlayer(playerTwo);
-    if(numOfPlayers == 3 || numOfPlayers == 4) {
-      drawPlayer(playerThree);
-    }
-    if(numOfPlayers == 4) {
-      drawPlayer(playerFour);
-    }
-}
 
-private void drawPlayer(Player player) {
-  fill(player.getColor());
-      stroke(player.getColor());
-      for(Pair p : player.getListOfPassedPoints()) {
-        ellipse(p.getX(), p.getY(), 5, 5);
-      }
-}
 
 void mousePressed() {
-    if((overButton(buttonCenterX, buttonCenterY, buttonRadius) && !started && !buttonPressed) || (!endOfGame && !buttonPressed && !started && overButton(11*width/12, height*0.8, buttonRadius) && !frontPage)) {
-        if(frontPage) {
-          playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText());
-          textField1.setVisible(false);
-          playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText());
-          textField2.setVisible(false);
-          playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText());
-          textField3.setVisible(false);
-          playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText());
-          textField4.setVisible(false);
-          btnL1.setVisible(false);
-          btnR1.setVisible(false);
-          btnL2.setVisible(false);
-          btnR2.setVisible(false);
-          btnL3.setVisible(false);
-          btnR3.setVisible(false);
-          btnL4.setVisible(false);
-          btnR4.setVisible(false);
-        }
+    if((!endOfGame && !startRound && !startCounter && overButton(11*width/12, height*0.8, width/20) && !frontPage)) {  
         startSound.close();
-        started = true;  
+        drawBackground(blackScreen);
+        startCounter = true;  
         initializePlayersOnStart();
         startTime = millis();
         playerOne.getListOfPassedPoints().clear();
@@ -606,32 +445,27 @@ void mousePressed() {
         playerThree.getListOfPassedPoints().clear();
         playerFour.getListOfPassedPoints().clear();
         startInterval = secondsToStart;
-        drawBackground(blackScreen);
         frontPage = false;
     } else if(overButton(width * 0.9, height * 0.2, 20) && !frontPage) {
       if(!endOfGame) {
           blackScreen = true;
           drawBackground(blackScreen);
-          drawAllPoints();
+          for(Player p : listOfPlayers)
+              drawWholePath(p);
       }
     } else if(overButton(width * 0.9 + 50, height * 0.2, 20) && !frontPage) {
        if(!endOfGame) {
            blackScreen = false;
            drawBackground(blackScreen);
-           drawAllPoints();
+           for(Player p : listOfPlayers)
+              drawWholePath(p);
        }
-    } else  chooseNumberOfPlayers();
-    
+    }
 }
 
 void initializePlayersOnStart() {
-        initializePlayer(playerOne);
-        initializePlayer(playerTwo);
-        if(numOfPlayers == 3 || numOfPlayers == 4) {
-            initializePlayer(playerThree);
-        }
-        if(numOfPlayers == 4) {
-          initializePlayer(playerFour);
+        for(Player p : listOfPlayers) {
+          initializePlayer(p);
         }
         playersLeft = numOfPlayers;
 }
@@ -643,43 +477,8 @@ private void initializePlayer(Player player) {
         player.setY((int)random(height/5, 4*height/5));
 } 
 
-void chooseNumberOfPlayers() {
- if(overButton((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
-      fill(0, 255, 0);
-      ellipse((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      fill(255, 0, 0);
-      ellipse((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      ellipse((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      writeTexts();
-      numOfPlayers = 3;
-      playersLeft = 3;
-    } else if(overButton((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
-      fill(0, 255, 0);
-      ellipse((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      fill(255, 0, 0);
-      ellipse((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      ellipse((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      writeTexts();
-      numOfPlayers = 4;
-      playersLeft = 4;
-    } else if(overButton((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius) && frontPage && !started && !buttonPressed) {
-      fill(0, 255, 0);
-      ellipse((width - numOfPlayersWidth)/2 + numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      fill(255, 0, 0);
-      ellipse((width - numOfPlayersWidth)/2 + 10 + 3*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      ellipse((width - numOfPlayersWidth)/2 + 20 + 5*numOfPlayersRadius, 3*height/4, numOfPlayersRadius, numOfPlayersRadius);
-      writeTexts();
-      numOfPlayers = 2;
-      playersLeft = 2;
-    } 
-}
 
-void writeTexts() {
-      fill(0, 0, 255);
-      text("2", (width - numOfPlayersWidth - textWidth("2"))/2 + numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-      text("3", (width - numOfPlayersWidth - textWidth("3"))/2 + 10 + 3*numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-      text("4", (width - numOfPlayersWidth - textWidth("4"))/2 + 20 + 5*numOfPlayersRadius, 3*height/4 + (textAscent() - textDescent()) / 2);
-}
+
 
 boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)  {
     if(dist(mouseX, mouseY, buttonCenterX, buttonCenterY) <= buttonRadius) return true;
@@ -812,8 +611,72 @@ private void setPlayerKeysCoded(Player player, GButton button, Turn direction) {
 
 */
 
-void handleButtonEvents(GButton button, GEvent event) {
-  button.setFocus(true);
+void handleButtonEvents(GButton button , GEvent event) {
+  if (button == btn2Players) {
+    btn2Players.setLocalColor(4, color(0, 255, 0));
+    btn3Players.setLocalColor(4, color(255, 0, 0));
+    btn4Players.setLocalColor(4, color(255, 0, 0));
+    numOfPlayers = 2;
+    playersLeft = 2;
+  } else if (button == btn3Players) {
+    btn2Players.setLocalColor(4, color(255, 0, 0));
+    btn3Players.setLocalColor(4, color(0, 255, 0));
+    btn4Players.setLocalColor(4, color(255, 0, 0));
+    numOfPlayers = 3;
+    playersLeft = 3;
+  } else if (button == btn4Players) {
+    btn2Players.setLocalColor(4, color(255, 0, 0));
+    btn3Players.setLocalColor(4, color(255, 0, 0));
+    btn4Players.setLocalColor(4, color(0, 255, 0));
+    numOfPlayers = 4;
+    playersLeft = 4;
+  } else if (button == btnStart) {
+    if(frontPage) {
+          playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText());
+          textField1.setVisible(false);
+          playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText());
+          textField2.setVisible(false);
+          playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText());
+          textField3.setVisible(false);
+          playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText());
+          textField4.setVisible(false);
+    
+          btnR1.setVisible(false);
+          btnL1.setVisible(false);
+          btnR2.setVisible(false);
+          btnL2.setVisible(false);
+          btnR3.setVisible(false);
+          btnL3.setVisible(false);
+          btnR4.setVisible(false);
+          btnL4.setVisible(false);
+          btnChooseColor1.setVisible(false);
+          btnChooseColor2.setVisible(false);
+          btnChooseColor3.setVisible(false);
+          btnChooseColor4.setVisible(false);
+          btn2Players.setVisible(false);
+          btn3Players.setVisible(false);
+          btn4Players.setVisible(false);
+          
+          btnStart.setVisible(false);
+          if(numOfPlayers == 3) listOfPlayers.add(playerThree);
+          if(numOfPlayers == 4) {
+              listOfPlayers.add(playerThree);
+              listOfPlayers.add(playerFour);
+          }
+      }
+      startSound.close();
+      drawBackground(blackScreen);
+      startCounter = true;  
+      initializePlayersOnStart();
+      startTime = millis();
+      playerOne.getListOfPassedPoints().clear();
+      playerTwo.getListOfPassedPoints().clear();
+      playerThree.getListOfPassedPoints().clear();
+      playerFour.getListOfPassedPoints().clear();
+      startInterval = secondsToStart;
+      frontPage = false;
+  } else { 
+    button.setFocus(true);
   if (button == btnL1) {
     btnL1.setText("Pritisni tipku");
   } else if (button == btnR1) {
@@ -830,5 +693,17 @@ void handleButtonEvents(GButton button, GEvent event) {
     btnL4.setText("Pritisni tipku");
   } else if (button == btnR4) {
     btnR4.setText("Pritisni tipku");
-  }
+  } else if (button == btnChooseColor1) {
+     showColorPicker = true;
+     btnL1.setVisible(false);
+     btnR1.setVisible(false);
+     btnChooseColor1.setVisible(false);
+     textField1.setVisible(false);
+} else if (button == btnChooseColor2) {
+  } else if (button == btnChooseColor3) {
+  } else if (button == btnChooseColor4) {
+  } else if (button == btnChooseColor1 && event == GEvent.CLICKED) {
+  }// if
 }
+}
+ 

@@ -1,0 +1,13 @@
+String title = "Pazi krivulja!";
+float titleSize = width/2;
+String player = "Igrač";
+float playerSize = width/3;
+String chooseColor = "Odaberi boju: ";
+float nameSize = width/4;
+String left = "Lijevo: ";
+String right = "Desno: ";
+String col = "Boja:";
+String rule1 = "Pravila: Upravljati svojom zmijicom i izbjegavati tragove koje ostavljaju ostale zmijice.";
+String rule2 = "Pobjednik je igrač koji duže preživi. Prvi igrač do 10 bodova pobjeđuje.";
+String chooseNumOfPlayers = "Odaberite broj igrača: ";
+float numOfPlayersSize = width/3;

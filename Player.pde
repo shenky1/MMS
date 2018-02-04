@@ -9,8 +9,9 @@ class Player {
   private int score;
   private boolean alive;
   private ArrayList<Pair> listOfPassedPoints;
-  private char left;
-  private char right;
+  private int left;
+  private int right;
+  private Pair winTextPosition;
 //  private int leftCoded;
 //  private int rightCoded;
   
@@ -25,11 +26,12 @@ class Player {
     alive = false;
  }
  
- public Player(char left, char right, color col) { 
+ public Player(int left, int right, color col, Pair winTextPosition) { 
    this("player", 0, 0, 1, color(0, 0, 0));
    this.left = left;
    this.right = right;
    this.col = col;
+   this.winTextPosition = winTextPosition;
  }
  
  /*public Player(int leftCoded, int rightCoded) {
@@ -107,7 +109,15 @@ class Player {
     listOfPassedPoints.add(p);
   }
   
-  public char getLeft() {
+  public Pair getWinTextPosition() {
+    return winTextPosition;
+  }
+  
+  public void setWinTextPosition(Pair winTextPosition) {
+    this.winTextPosition = winTextPosition;
+  }
+  
+  public int getLeft() {
     return left;
   }
   
@@ -115,7 +125,7 @@ class Player {
     this.left = c;
   }
   
-  public char getRight() {
+  public int getRight() {
     return right;
   }
   

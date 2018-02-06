@@ -13,7 +13,8 @@ class Player {
   private Pair winTextPosition;
   private int size;
   private float direction;
-
+  private boolean leftPressed;
+  private boolean rightPressed;
   
  public Player(String name, int x, int y, int direction, color col) {
     this.name = name;
@@ -25,6 +26,8 @@ class Player {
     this.score = 0;
     this.alive = false;
     this.size = 5;
+    this.leftPressed = false;
+    this.rightPressed = false;
  }
  
  public Player(int left, int right, color col, Pair winTextPosition) { 
@@ -134,5 +137,21 @@ class Player {
   
   public void setRight(char c) {
     this.right = c;
+  }
+  
+    public boolean isLeftPressed() {
+    return leftPressed;
+  }
+  
+  public void setLeftPressed(boolean leftPressed) {
+    this.leftPressed = leftPressed;
+  }
+  
+  public boolean isRightPressed() {
+    return rightPressed;
+  }
+  
+  public void setRightPressed(boolean rightPressed) {
+    this.rightPressed = rightPressed;
   }
 }

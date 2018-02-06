@@ -179,6 +179,12 @@ void draw() {
             if(p.isAlive()) { 
                 Move(p);
                 checkIfCollision(p);
+                if(p.isLeftPressed()) {
+                  p.setDirection(p.getDirection() + PI/45);
+                }
+                if(p.isRightPressed()) {
+                  p.setDirection(p.getDirection() - PI/45);
+                }
             }        
         
         drawAllPlayersCurrentPositions();
@@ -490,10 +496,13 @@ void setGradient(int x, int y, float w, float h, color c1, color c2, int axis ) 
 
 void keyPressed() {
   if(!frontPage) {
-    changeDirection(playerOne);
-    changeDirection(playerTwo);
-    changeDirection(playerThree);
-    changeDirection(playerFour); 
+    for(Player player : listOfPlayers) {
+       if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
+          player.setLeftPressed(true);
+        } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
+          player.setRightPressed(true);
+        }
+    }
   } else {
     if(key != CODED) {
       setPlayerKeys(playerOne, btnL1, Turn.LEFT);
@@ -666,4 +675,16 @@ void handleButtonEvents(GButton button , GEvent event) {
     btnR4.setText("Pritisni tipku");
   }
  }
+}
+
+void keyReleased() {
+    if(!frontPage) {
+    for(Player player : listOfPlayers) {
+       if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
+          player.setLeftPressed(false);
+        } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
+          player.setRightPressed(false);
+        }
+    }
+  } 
 }

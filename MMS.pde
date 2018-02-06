@@ -13,7 +13,6 @@ boolean endOfGame = false; // Any player reached numOfPointsToWin;
 
 int numOfPlayers; // starting number of players
 int playersLeft; // how many players are alive at any time during the game
-int rectangleSize = 5;
 
 int numOfPointsForWin = 30; //final number of points to win
 
@@ -41,7 +40,7 @@ GButton btnStart;
 void setup() {
    // size(900,600);
     fullScreen();
-    frameRate(100);
+    frameRate(30);
     textSize(width/60);
     playerOne = new Player(37, 39, color(255, 0, 0), new Pair(int(textWidth("POBJEDNIK!")/2), height/12)); // <-, ->
     playerTwo = new Player(65, 68, color(0, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), height/12)); // A, D
@@ -194,7 +193,10 @@ private void startCountdown() {
             for(Player p : listOfPlayers) {
               fill(p.getColor());
               stroke(p.getColor());
-              rect(p.getX(), p.getY(), p.getX() + rectangleSize - 1, p.getY() + rectangleSize - 1);
+              ellipse(p.getX(), p.getY(), p.getSize(), p.getSize());
+              fill(255, 255, 0);
+              ellipse(p.getX() + p.getSize() * cos(p.getDirection()), p.getY() + p.getSize() * -sin(p.getDirection()), 1, 1);
+
             }
             fill(127, 0, 0);
             text(str(startInterval - 1), 5*width/12, (height - textWidth("0"))/2);
@@ -211,16 +213,10 @@ private void startCountdown() {
 
 private void Move(Player player) {
     if(player.isAlive()) {  
-      switch(player.getDirection()) {
-        case 1: player.setX(player.getX() - rectangleSize);
-                break;
-        case 2: player.setY(player.getY() - rectangleSize);
-                break;
-        case 3: player.setX(player.getX() + rectangleSize);
-                break;
-        case 4: player.setY(player.getY() + rectangleSize); 
-                break;    
-      }
+        int x = int(player.getSize() * cos(player.getDirection()));
+        int y = int(player.getSize() * -sin(player.getDirection()));
+        player.setX(player.getX() + x);
+        player.setY(player.getY() + y);
     }
 }
 
@@ -283,15 +279,20 @@ private void drawPlayerScore(Player player, float distance) {
 }
 
 private boolean hasCrashed(Player player) {
-  boolean result = false;
-  for(int i = 0; i < rectangleSize; ++i) {
-      for(int j = 0; j < rectangleSize; ++j) {
-          color col = get(i + player.getX(), j + player.getY());
-          if(col != color(255) && col != color(0)) result = true;
-          else set(i + player.getX(), j + player.getY(), player.getColor());
-      }
-  }
-   return result;
+     float directionStart = player.getDirection() - PI/2; //<>//
+     float directionEnd = directionStart + PI;
+     float directionToCheck = directionStart;
+     while(directionToCheck <= directionEnd) {
+          int xToCheck = int(player.getX() + (player.getSize() + 2) * cos(directionToCheck));
+          int yToCheck = int(player.getY() + (player.getSize() + 2) * -sin(directionToCheck));
+          color col = get(xToCheck, yToCheck);
+          if(col != color(255) && col != color(0)) {
+              println(directionToCheck, col, xToCheck, yToCheck, player.getX(), player.getY());  
+              return true;
+          }
+          directionToCheck += 2*PI/360;
+     }
+   return false;
 }
 
 private void checkIfCollision(Player player) {
@@ -340,16 +341,15 @@ void drawAllPlayersCurrentPositions() {
 private void drawPlayersCurrentPosition(Player player) {
       fill(player.getColor());
       stroke(player.getColor());
-      rect(player.getX(), player.getY(), player.getX() + rectangleSize - 1, player.getY() + rectangleSize - 1);
+      ellipse(player.getX(), player.getY(), player.getSize(), player.getSize());
       player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
 }
-
 private void drawWholePath(Player player) {
    ArrayList<Pair> passedPoints = player.getListOfPassedPoints();
    fill(player.getColor());
    stroke(player.getColor());
    for(Pair p : passedPoints) {
-       rect(p.getX(), p.getY(), p.getX() + rectangleSize - 1, p.getY() + rectangleSize - 1);
+       ellipse(p.getX(), p.getY(), player.getSize(), player.getSize());
    }
 }
 
@@ -447,7 +447,6 @@ void initializePlayersOnStart() {
 
 private void initializePlayer(Player player) {
         player.setAlive(true);
-        player.setDirection((int) random(1, 4.99));
         float u = random(0, 1);
         float v = random(0, 1);
         
@@ -458,6 +457,8 @@ private void initializePlayer(Player player) {
         
         player.setX(width/2 + x);
         player.setY(height/2 + y);
+        
+        player.setDirection(t);
 } 
 
 
@@ -518,13 +519,9 @@ void keyPressed() {
 
 private void changeDirection(Player player) {
     if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-          if(player.getDirection() == 1) 
-              player.setDirection(4);
-          else player.setDirection(player.getDirection() - 1);
+          player.setDirection(player.getDirection() + PI/45);
     } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-          if(player.getDirection() == 4) 
-              player.setDirection(1);
-          else player.setDirection(player.getDirection() + 1);
+          player.setDirection(player.getDirection() - PI/45);
     }
 }
 

@@ -38,7 +38,7 @@ GButton btn2Players, btn3Players, btn4Players;
 GButton btnStart;
 
 void setup() {
-   // size(900,600);
+  //  size(900,600);
     fullScreen();
     frameRate(30);
     textSize(width/60);
@@ -173,246 +173,73 @@ void draw() {
     }
   
     if(startRound) {
-      
         drawSideBar();
         for(Player p : listOfPlayers) 
             if(p.isAlive()) { 
                 Move(p);
                 checkIfCollision(p);
-                if(p.isLeftPressed()) {
-                  p.setDirection(p.getDirection() + PI/45);
-                }
-                if(p.isRightPressed()) {
-                  p.setDirection(p.getDirection() - PI/45);
-                }
+                checkIfKeysPressed(p);
             }        
-        
         drawAllPlayersCurrentPositions();
     }
 }
 
+/*
+* Starts countdown. From startInterval to 0.  
+* Draws initial positions of players. 
+* When startInterval reaches 0 starts the game.
+*/
 private void startCountdown() {
-        drawSideBar();
-        if(millis() - startTime > 1000 && startInterval >= 0) {
-            drawPlayingArea();
-            drawBackground(blackScreen);
-            for(Player p : listOfPlayers) {
-              fill(p.getColor());
-              stroke(p.getColor());
-              ellipse(p.getX(), p.getY(), p.getSize(), p.getSize());
-              fill(255, 255, 0);
-              ellipse(p.getX() + p.getSize() * cos(p.getDirection()), p.getY() + p.getSize() * -sin(p.getDirection()), 1, 1);
-
-            }
-            fill(127, 0, 0);
-            text(str(startInterval - 1), 5*width/12, (height - textWidth("0"))/2);
-            startTime = millis();
-            startInterval--;
-        }
-        if(startInterval == 0) {
-            startCounter = false;
-            drawBackground(blackScreen);
-            drawPlayingArea();
-            startRound = true;
-        }
-}
-
-private void Move(Player player) {
-    if(player.isAlive()) {  
-        int x = int(player.getSize() * cos(player.getDirection()));
-        int y = int(player.getSize() * -sin(player.getDirection()));
-        player.setX(player.getX() + x);
-        player.setY(player.getY() + y);
-    }
-}
-
-private void drawPlayingArea() {
-    int heightHalf = height/2;
-    int widthHalf = 5*width/12;
-    float widthSqr = pow(widthHalf,2);
-    float heightSqr = pow(heightHalf, 2);
-    ellipse(widthHalf, heightHalf, widthHalf, heightHalf);
-    for(int i = 0; i < 5*width/6; ++i) 
-        for(int j = 0; j < height; ++j) {
-            if(pow(i - widthHalf, 2)/widthSqr + pow(j - heightHalf, 2)/heightSqr > 1) {
-               if(i > widthHalf && j > heightHalf) {
-                   set(i, j, playerFour.getColor());
-               } else if(i > widthHalf && j < heightHalf) {
-                 set(i, j, playerTwo.getColor());
-               } else if(i < widthHalf && j < heightHalf) {
-                 set(i, j, playerOne.getColor());
-               } else set (i, j, playerThree.getColor());
-            }
-        }
-}
-
-//drawing side bar every frame
-private void drawSideBar() {
-    //white rectangle first
-    fill(255);
-    rect(5*width/6, 0, width, height);
-    
-    //information about exit
-    textSize((width + height)/60);
-    fill(127, 0, 0);
-    text("Izlaz: esc", 6*width/7, height/10);
-
-    //current score
-    text("Rezultat:", 6*width/7, height/3);
-    textSize((width + height)/100);
-    float textHeight = textAscent() - textDescent();
-    drawPlayerScore(playerOne, 2*textHeight);
-    drawPlayerScore(playerTwo, 4*textHeight);
-    if(numOfPlayers == 3 ||numOfPlayers == 4) {
-        drawPlayerScore(playerThree, 6*textHeight);
-    }
-    if(numOfPlayers == 4) {
-        drawPlayerScore(playerFour, 8*textHeight);
-    }
-    
-    //buttons for black or white screen
-    stroke(0, 0, 0);
-    fill(255);
-    ellipse(width * 0.9 + 50, height*0.2, width/60, width/60);
-    fill(0);
-    ellipse(width * 0.9, height*0.2, width/60, width/60);
-}
-
-private void drawPlayerScore(Player player, float distance) {
-    fill(player.getColor());
-    text(player.getName()+ ": ", 6*width/7, height/3 + distance);
-    text(player.getScore(), 6*width/7 + textWidth(player.getName()+ ": "), height/3 + distance);
-}
-
-private boolean hasCrashed(Player player) {
-     float directionStart = player.getDirection() - PI/2; //<>//
-     float directionEnd = directionStart + PI;
-     float directionToCheck = directionStart;
-     while(directionToCheck <= directionEnd) {
-          int xToCheck = int(player.getX() + (player.getSize() + 2) * cos(directionToCheck));
-          int yToCheck = int(player.getY() + (player.getSize() + 2) * -sin(directionToCheck));
-          color col = get(xToCheck, yToCheck);
-          if(col != color(255) && col != color(0)) {
-              println(directionToCheck, col, xToCheck, yToCheck, player.getX(), player.getY());  
-              return true;
-          }
-          directionToCheck += 2*PI/360;
-     }
-   return false;
-}
-
-private void checkIfCollision(Player player) {
-   if(player.isAlive() && hasCrashed(player)) {
-        playSound(crashSound);
-               
-                
-        // if first to die get 0 points, if second to die get 1 point etc (exponents of number 2).. If n players were in the game winner of round wins 2^(n-2) points
-        int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
-        player.setScore(player.getScore() + pointsWon);
-        player.setAlive(false);
-
-        playersLeft--;
-        if(playersLeft == 1) {
-          for(Player p : listOfPlayers) {
-            if(player != p && p.isAlive()) announceRoundWinner(p);
-          }
-        }
-    }
-}
-
-private void announceRoundWinner(Player player) {
-    playSound(cheerSound);
-    startRound = false;
-    
-    int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
-    player.setScore(player.getScore() + pointsWon);
-    float textHeight = textAscent() - textDescent();
     drawSideBar();
-    fill(player.getColor());
-    text("Runda završena!", 6*width/7, height/2 + 2*textHeight);
-    text("Pobjednik:", 6*width/7, height/2 + 4*textHeight); 
-    text(player.getName(), 6*width/7, height/2 + 6*textHeight);
-    fill(255);
-    textSize(width/60);
-    text("POBJEDNIK!", player.getWinTextPosition().getX(), player.getWinTextPosition().getY());
-    checkIfGameOver();
-}
-
-void drawAllPlayersCurrentPositions() {
-    for(Player p : listOfPlayers) {
-      if(p.isAlive()) drawPlayersCurrentPosition(p);
+    if(millis() - startTime > 1000 && startInterval >= 0) {
+        drawPlayingArea();
+        drawBackground(blackScreen);
+           
+        for(Player p : listOfPlayers) {
+            fill(p.getColor());
+            stroke(p.getColor());
+            ellipse(p.getX(), p.getY(), p.getSize(), p.getSize());
+            //Little circle of radius 1 indicating starting direction before round starts 
+            fill(255, 255, 0);
+            ellipse(p.getX() + p.getSize() * cos(p.getDirection()), p.getY() + p.getSize() * -sin(p.getDirection()), 1, 1);
+        }
+        
+        fill(127, 0, 0);
+        text(str(startInterval - 1), 5*width/12, (height - textWidth("0"))/2);
+        startTime = millis();
+        startInterval--;
+    }
+    
+    if(startInterval == 0) {
+        startCounter = false;
+        drawBackground(blackScreen);
+        drawPlayingArea();
+        startRound = true;
     }
 }
 
-private void drawPlayersCurrentPosition(Player player) {
-      fill(player.getColor());
-      stroke(player.getColor());
-      ellipse(player.getX(), player.getY(), player.getSize(), player.getSize());
-      player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
-}
-private void drawWholePath(Player player) {
-   ArrayList<Pair> passedPoints = player.getListOfPassedPoints();
-   fill(player.getColor());
-   stroke(player.getColor());
-   for(Pair p : passedPoints) {
-       ellipse(p.getX(), p.getY(), player.getSize(), player.getSize());
-   }
+/*
+* Moving player. Called only in draw method.
+* Depending on player direction calculates new x and y values.
+*/
+private void Move(Player player) {
+    int x = int(player.getSize() * cos(player.getDirection()));
+    int y = int(player.getSize() * -sin(player.getDirection()));
+    player.setX(player.getX() + x);
+    player.setY(player.getY() + y);
 }
 
-void playSound(AudioPlayer sound) {
+/*
+* Plays a sound and prepares it to play again (rewind).
+*/ //<>//
+private void playSound(AudioPlayer sound) {
     sound.play();
     sound.rewind();
 }
 
-private void checkIfGameOver() {
-    Player winPlayer = null;
-    if(playerOne.getScore() >= numOfPointsForWin || playerTwo.getScore() >= numOfPointsForWin 
-    || playerThree.getScore() >= numOfPointsForWin || playerFour.getScore() >= numOfPointsForWin) {
-      int topPoints = 0;
-      for(Player p : listOfPlayers) {
-        if(p.getScore() > topPoints) {
-          topPoints = p.getScore();
-          winPlayer = p;
-        }
-      }
-      announceFinalWinner(winPlayer);
-    } else {
-      drawAgainButton();
-    }
-}
-
-private void drawAgainButton() {
-      fill(0, 255, 0);
-      ellipse(11*width/12, height*0.8, width/20, width/20);
-      fill(127, 0, 0);
-      textSize((width + height)/70);
-      float textHeight = textAscent() - textDescent();
-      float textWidth = textWidth("Nastavi!");
-      text("Nastavi!", 11*width/12 - textWidth/2, height*0.8 + textHeight/2);  
-}
-
-private void announceFinalWinner(Player player) {
-      fill(player.getColor());
-      rect(0, 0, 5*width/6, height);
-      float textWidth = textWidth(player.getName() + "je pobjednik!");
-      fill(0);
-      text(player.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
-      playSound(endCheerSound);
-      endOfGame = true;
-      noLoop();
-}
-
-void drawBackground(boolean blackScreen) {
-   if(blackScreen) {
-      fill(0);
-   } else {
-     fill(255);
-   }
-   ellipse(5*width/12, height/2, 5*width/12, height/2);
-}
-
-
-
+/*
+* Handles events for buttons that aren't from G4P library.
+*/
 void mousePressed() {
     if((!endOfGame && !startRound && !startCounter && overButton(11*width/12, height*0.8, width/20) && !frontPage)) {  
         startSound.close();
@@ -427,12 +254,12 @@ void mousePressed() {
         startInterval = secondsToStart;
         frontPage = false;
     } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
-      if(!endOfGame) {
-          blackScreen = true;
-          drawBackground(blackScreen);
-          for(Player p : listOfPlayers)
-              drawWholePath(p);
-      }
+        if(!endOfGame) {
+            blackScreen = true;
+            drawBackground(blackScreen);
+            for(Player p : listOfPlayers)
+                drawWholePath(p);
+        }
     } else if(overButton(width * 0.9 + 50, height * 0.2, width/60) && !frontPage) {
        if(!endOfGame) {
            blackScreen = false;
@@ -443,39 +270,19 @@ void mousePressed() {
     }
 }
 
-void initializePlayersOnStart() {
-        initializePlayer(playerOne);
-        initializePlayer(playerTwo);
-        if(numOfPlayers >= 3) initializePlayer(playerThree);
-        if(numOfPlayers == 4) initializePlayer(playerFour);
-        playersLeft = numOfPlayers;
-}
-
-private void initializePlayer(Player player) {
-        player.setAlive(true);
-        float u = random(0, 1);
-        float v = random(0, 1);
-        
-        float w = height/4 * u;
-        float t = 2 * PI * v;
-        int x = int(w * cos(t));
-        int y = int(w * sin(t));
-        
-        player.setX(width/2 + x);
-        player.setY(height/2 + y);
-        
-        player.setDirection(t);
-} 
-
-
-
-
+/*
+* Checks if mouse if over button used in mousePressed().
+*/
 boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)  {
     if(dist(mouseX, mouseY, buttonCenterX, buttonCenterY) <= buttonRadius) return true;
     else return false;
 }
 
-void setGradient(int x, int y, float w, float h, color c1, color c2, int axis ) {
+/*
+* Set gradient on front screen.
+* (Background color).
+*/
+private void setGradient(int x, int y, float w, float h, color c1, color c2, int axis ) {
     noFill();
     if (axis == 1) {  // Top to bottom gradient
         for (int i = y; i <= y+h; i++) {
@@ -494,197 +301,113 @@ void setGradient(int x, int y, float w, float h, color c1, color c2, int axis ) 
     }
 }
 
+
+/*
+* If in game key or keyCode equals to any player's left or right key. Set boolean variable of a player that his left or right key is not pressed anymore (released).
+* If start screen adjusts buttons' text and set players' new keys.
+*/
 void keyPressed() {
-  if(!frontPage) {
-    for(Player player : listOfPlayers) {
-       if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-          player.setLeftPressed(true);
-        } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-          player.setRightPressed(true);
+    if(!frontPage) {
+        for(Player player : listOfPlayers) {
+            if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
+                player.setLeftPressed(true);
+            } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
+                player.setRightPressed(true);
+            }
         }
-    }
-  } else {
-    if(key != CODED) {
-      setPlayerKeys(playerOne, btnL1, Turn.LEFT);
-      setPlayerKeys(playerOne, btnR1, Turn.RIGHT);
-      setPlayerKeys(playerTwo, btnL2, Turn.LEFT);
-      setPlayerKeys(playerTwo, btnR2, Turn.RIGHT);
-      setPlayerKeys(playerThree, btnL3, Turn.LEFT);
-      setPlayerKeys(playerThree, btnR3, Turn.RIGHT);
-      setPlayerKeys(playerFour, btnL4, Turn.LEFT);
-      setPlayerKeys(playerFour, btnR4, Turn.RIGHT);
     } else {
-      setPlayerKeysCoded(playerOne, btnL1, Turn.LEFT);
-      setPlayerKeysCoded(playerOne, btnR1, Turn.RIGHT);
-      setPlayerKeysCoded(playerTwo, btnL2, Turn.LEFT);
-      setPlayerKeysCoded(playerTwo, btnR2, Turn.RIGHT);
-      setPlayerKeysCoded(playerThree, btnL3, Turn.LEFT);
-      setPlayerKeysCoded(playerThree, btnR3, Turn.RIGHT);
-      setPlayerKeysCoded(playerFour, btnL4, Turn.LEFT);
-      setPlayerKeysCoded(playerFour, btnR4, Turn.RIGHT);
-    }
-  }
-}
-
-private void changeDirection(Player player) {
-    if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-          player.setDirection(player.getDirection() + PI/45);
-    } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-          player.setDirection(player.getDirection() - PI/45);
+        setPlayerKeys(playerOne, btnL1, Turn.LEFT);
+        setPlayerKeys(playerOne, btnR1, Turn.RIGHT);
+        setPlayerKeys(playerTwo, btnL2, Turn.LEFT);
+        setPlayerKeys(playerTwo, btnR2, Turn.RIGHT);
+        setPlayerKeys(playerThree, btnL3, Turn.LEFT);
+        setPlayerKeys(playerThree, btnR3, Turn.RIGHT);
+        setPlayerKeys(playerFour, btnL4, Turn.LEFT);
+        setPlayerKeys(playerFour, btnR4, Turn.RIGHT);
     }
 }
 
-
-enum Turn {
-  LEFT, RIGHT;
-}
-
-private void setPlayerKeys(Player player, GButton button, Turn direction) {
-    char wishedKey = Character.toUpperCase(key);
-    String keyStr = wishedKey + "";
-
-    if (button.hasFocus()) {
-        if(isAvailable(wishedKey)) {
-           button.setText(keyStr);
-           if(direction == Turn.LEFT) player.setLeft(wishedKey);
-           else player.setRight(wishedKey);
-           button.setFocus(false);
-         } else {
-           button.setText("Zauzeto!");
-         }
-    }
-}
-
-private boolean isAvailable(char wishedKey) {
-    for(Player p : listOfPlayers) {
-      if(p.getLeft() == wishedKey || p.getRight() == wishedKey) {
-          return false;
-      }
-    }
-      return true;
-}
-
-
-private void setPlayerKeysCoded(Player player, GButton button, Turn direction) {
- 
-  if (button.hasFocus()) {
-       switch(keyCode) {
-         case LEFT:
-           button.setText("LEFT");
-           break;
-         case RIGHT:
-           button.setText("RIGHT");
-           break;
-         case UP:
-           button.setText("UP");
-           break;
-         case DOWN:
-           button.setText("DOWN");
-           break;
-         case ALT:
-           button.setText("ALT");
-           break;
-         case CONTROL:
-           button.setText("CTRL");
-           break;
-         case SHIFT:
-           button.setText("SHIFT");
-           break;
-       }
-       if(isAvailable((char)keyCode)) {
-         if(direction == Turn.LEFT) player.setLeft((char)keyCode);
-         else player.setRight((char)keyCode);
-         button.setFocus(false);
-       } else {
-         button.setText("Zauzeto!");
-       }
-    }
-}
-
-void handleButtonEvents(GButton button , GEvent event) {
-  if (button == btn2Players) {
-    btn2Players.setLocalColor(4, color(0, 255, 0));
-    btn3Players.setLocalColor(4, color(255, 0, 0));
-    btn4Players.setLocalColor(4, color(255, 0, 0));
-    numOfPlayers = 2;
-    playersLeft = 2;
-  } else if (button == btn3Players) {
-    btn2Players.setLocalColor(4, color(255, 0, 0));
-    btn3Players.setLocalColor(4, color(0, 255, 0));
-    btn4Players.setLocalColor(4, color(255, 0, 0));
-    numOfPlayers = 3;
-    playersLeft = 3;
-  } else if (button == btn4Players) {
-    btn2Players.setLocalColor(4, color(255, 0, 0));
-    btn3Players.setLocalColor(4, color(255, 0, 0));
-    btn4Players.setLocalColor(4, color(0, 255, 0));
-    numOfPlayers = 4;
-    playersLeft = 4;
-  } else if (button == btnStart) {
-    if(frontPage) {
-          playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText().length() > 8 ? textField1.getText().substring(0,8) : textField1.getText());
-          textField1.setVisible(false);
-          playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText().length() > 8 ? textField2.getText().substring(0,8) : textField2.getText());
-          textField2.setVisible(false);
-          playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText().length() > 8 ? textField3.getText().substring(0,8) : textField3.getText());
-          textField3.setVisible(false);
-          playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText().length() > 8 ? textField4.getText().substring(0,8) : textField4.getText());
-          textField4.setVisible(false);
-          btnR1.setVisible(false);
-          btnL1.setVisible(false);
-          btnR2.setVisible(false);
-          btnL2.setVisible(false);
-          btnR3.setVisible(false);
-          btnL3.setVisible(false);
-          btnR4.setVisible(false);
-          btnL4.setVisible(false);
-          btn2Players.setVisible(false);
-          btn3Players.setVisible(false);
-          btn4Players.setVisible(false);
-          btnStart.setVisible(false);
-          background(255);
-          frontPage = false;
-      }
-      startSound.close();
-      startCounter = true;  
-      initializePlayersOnStart();
-      startTime = millis();
-      playerOne.getListOfPassedPoints().clear();
-      playerTwo.getListOfPassedPoints().clear();
-      playerThree.getListOfPassedPoints().clear();
-      playerFour.getListOfPassedPoints().clear();
-      startInterval = secondsToStart;
-
-  } else { 
-    button.setFocus(true);
-  if (button == btnL1) {
-    btnL1.setText("Pritisni tipku");
-  } else if (button == btnR1) {
-    btnR1.setText("Pritisni tipku");
-  } else if (button == btnL2) { 
-    btnL2.setText("Pritisni tipku");
-  } else if (button == btnR2) {
-    btnR2.setText("Pritisni tipku");
-  } else if (button == btnL3) {
-    btnL3.setText("Pritisni tipku");
-  } else if (button == btnR3) {
-    btnR3.setText("Pritisni tipku");
-  } else if (button == btnL4) {
-    btnL4.setText("Pritisni tipku");
-  } else if (button == btnR4) {
-    btnR4.setText("Pritisni tipku");
-  }
- }
-}
-
+/*
+* If key or keyCode equals to any player's left or right key. Set boolean variable of a player that his left or right key is not pressed anymore (released).
+*/
 void keyReleased() {
     if(!frontPage) {
-    for(Player player : listOfPlayers) {
-       if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-          player.setLeftPressed(false);
-        } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-          player.setRightPressed(false);
-        }
+        for(Player player : listOfPlayers) {
+            if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
+                player.setLeftPressed(false);
+            } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
+                player.setRightPressed(false);
+            }
+         }
+    } 
+}
+
+
+
+/*
+* If button is one of choose player button change their colors and set num of players and players left variables.
+* If button is start button
+*/
+void handleButtonEvents(GButton button , GEvent event) {
+    if (button == btn2Players) {
+        btn2Players.setLocalColor(4, color(0, 255, 0));
+        btn3Players.setLocalColor(4, color(255, 0, 0));
+        btn4Players.setLocalColor(4, color(255, 0, 0));
+        numOfPlayers = 2;
+        playersLeft = 2;
+    } else if (button == btn3Players) {
+        btn2Players.setLocalColor(4, color(255, 0, 0));
+        btn3Players.setLocalColor(4, color(0, 255, 0));
+        btn4Players.setLocalColor(4, color(255, 0, 0));
+        numOfPlayers = 3;
+        playersLeft = 3;
+    } else if (button == btn4Players) {
+        btn2Players.setLocalColor(4, color(255, 0, 0));
+        btn3Players.setLocalColor(4, color(255, 0, 0));
+        btn4Players.setLocalColor(4, color(0, 255, 0));
+        numOfPlayers = 4;
+        playersLeft = 4;
+    } else if (button == btnStart) {
+        background(255);
+        startSound.close();
+        frontPage = false;
+        
+        playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText().length() > 8 ? textField1.getText().substring(0,8) : textField1.getText());
+        textField1.setVisible(false);
+        playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText().length() > 8 ? textField2.getText().substring(0,8) : textField2.getText());
+        textField2.setVisible(false);
+        playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText().length() > 8 ? textField3.getText().substring(0,8) : textField3.getText());
+        textField3.setVisible(false);
+        playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText().length() > 8 ? textField4.getText().substring(0,8) : textField4.getText());
+        textField4.setVisible(false);
+        
+        btnR1.setVisible(false);
+        btnL1.setVisible(false);
+        btnR2.setVisible(false);
+        btnL2.setVisible(false);
+        btnR3.setVisible(false);
+        btnL3.setVisible(false);
+        btnR4.setVisible(false);
+        btnL4.setVisible(false);
+        btn2Players.setVisible(false);
+        btn3Players.setVisible(false);
+        btn4Players.setVisible(false);
+        btnStart.setVisible(false);
+  
+        initializePlayersOnStart();
+  
+        playerOne.getListOfPassedPoints().clear();
+        playerTwo.getListOfPassedPoints().clear();
+        playerThree.getListOfPassedPoints().clear();
+        playerFour.getListOfPassedPoints().clear();
+  
+        startCounter = true;  
+        startTime = millis();
+        startInterval = secondsToStart;
+    } else { 
+        button.setFocus(true);
+        if (button == btnL1 || button == btnL2 || button == btnL3 || button == btnL4 || button == btnR1 || button == btnR2 || button == btnR3 || button == btnR4) {
+            button.setText("Pritisni tipku");
+        } 
     }
-  } 
 }

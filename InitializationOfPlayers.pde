@@ -21,7 +21,7 @@ private void initializePlayer(Player player) {
     float w = height/3 * u;
     float t = 2 * PI * v;
     int x = int(w * cos(t));
-    int y = int(w * sin(t));
+    int y = int(w * -sin(t));
     
     player.setX(5*width/12 + x);
     player.setY(height/2 + y);

@@ -36,7 +36,19 @@ private void setPlayerKeys(Player player, GButton button, Turn direction) {
                 button.setText("Zauzeto!");
             }
         } else if(isAvailable(wishedKey)) {
-            button.setText(keyStr);
+            if(key == BACKSPACE) {
+                button.setText("BACKSPACE");
+            } else if(key == TAB) {
+                button.setText("TAB");
+            } else if(key == ENTER) {
+                button.setText("ENTER");
+            } else if(key == RETURN) {
+                button.setText("RETURN");
+            } else if(key == DELETE) {
+                button.setText("DELETE");
+            } else {
+                button.setText(keyStr);
+            }
             if(direction == Turn.LEFT) player.setLeft(wishedKey);
             else player.setRight(wishedKey);
             button.setFocus(false);
@@ -65,9 +77,9 @@ private boolean isAvailable(char wishedKey) {
 */
 private void checkIfKeysPressed(Player p) {
     if(p.isLeftPressed()) {
-        p.setDirection(p.getDirection() + PI/45);
+        p.setDirection(p.getDirection() + PI/30);
     }
     if(p.isRightPressed()) {
-        p.setDirection(p.getDirection() - PI/45);
+        p.setDirection(p.getDirection() - PI/30);
     }
 }

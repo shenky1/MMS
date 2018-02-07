@@ -45,6 +45,10 @@ class Player {
     */
     private int size;
     /*
+    * Current speed of a player.
+    */
+    private int speed;
+    /*
     *  Current direction (angle) of a player.
     */
     private float direction;
@@ -68,7 +72,8 @@ class Player {
         this.col = col;
         
         this.listOfPassedPoints = new ArrayList<Pair>();
-        this.size = 3;
+        this.size = 4;
+        this.speed = 1;
     }
  
     public Player(int left, int right, color col, Pair winTextPosition) { 
@@ -162,6 +167,14 @@ class Player {
     
     public void setSize(int size) {
         this.size = size;
+    }
+    
+    public int getSpeed() {
+        return speed;
+    }
+    
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
     
     public int getLeft() {

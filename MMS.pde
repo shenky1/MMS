@@ -1,15 +1,23 @@
- //<>//
+import processing.video.*; //<>// //<>// //<>//
 import ddf.minim.*;
 import g4p_controls.*;
 
 AudioPlayer crashSound, cheerSound, startSound, endCheerSound;
 Minim minim;//audio context
 
+Movie loadingVideo;
+int startVideo;
+
 boolean startRound = false; // start button
 boolean startCounter = false;  // used for countdown
 boolean frontPage = true; // am I on front page
 boolean blackScreen = false; // do I want black board or white
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
+boolean boosterShown = false;
+boolean playVideo;
+
+float textWidth;
+float textHeight;
 
 int numOfPlayers; // starting number of players
 int playersLeft; // how many players are alive at any time during the game
@@ -17,6 +25,9 @@ int playersLeft; // how many players are alive at any time during the game
 int numOfPointsForWin = 30; //final number of points to win
 
 Player playerOne, playerTwo, playerThree, playerFour;
+
+int doubleSpeedBoosterX;
+int doubleSpeedBoosterY;
 
 ArrayList<Player> listOfPlayers;
 
@@ -40,7 +51,13 @@ GButton btnStart;
 void setup() {
   //  size(900,600);
     fullScreen();
-    frameRate(30);
+    frameRate(20);
+    
+    loadingVideo = new Movie(this, "loadingVideo.mp4");
+    loadingVideo.play();
+    startVideo = millis();
+    playVideo = true;
+    
     textSize(width/60);
     playerOne = new Player(37, 39, color(255, 0, 0), new Pair(int(textWidth("POBJEDNIK!")/2), height/12)); // <-, ->
     playerTwo = new Player(65, 68, color(0, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), height/12)); // A, D
@@ -63,111 +80,34 @@ void setup() {
     numOfPlayers = 2;
     playersLeft = 2;
     
-    setGradient(0, 0, width/2, height, b1, b2, 2);
-    setGradient(width/2, 0, width/2, height, b2, b1, 2); 
-
     PFont startPageFont = createFont("CaviarDreams_Bold.ttf", 60);
-    textFont(startPageFont);
-    fill(0, 0, 255);   
-    
-    textSize((height + width)/50);
-    float textWidth = textWidth(title);
-    float textHeight = textAscent() - textDescent();
-    text(title, (width - textWidth)/2, height/7 - textHeight);
-  
-    float buttonWidth = width/20;
-    float buttonHeight = textHeight;
-    
-    textSize((height + width)/70);
-    textWidth = textWidth(chooseColor);
-    textHeight = textAscent() - textDescent();
-    
-    fill(0, 0, 120);
-    textSize((height + width)/60); 
-    fill(playerOne.getColor());
-    text(player + "1", width/3 - textWidth - buttonWidth, height/7 + textAscent() - textDescent());  
-    fill(playerTwo.getColor());
-    text(player + "2", 2*width/3, height/7 + textAscent() - textDescent());    
-    fill(playerThree.getColor());
-    text(player + "3", width/3 - textWidth - buttonWidth, height/2 + textAscent() - textDescent());
-    fill(playerFour.getColor());
-    text(player + "4", 2*width/3, height/2 + textAscent() - textDescent());
-     
-    fill(0, 0, 120);
-    textSize((height + width)/70);
-    textWidth = textWidth(chooseColor);
-    textHeight = textAscent() - textDescent();
-    float textNameWidth = textWidth(name);
-    float textFieldWidth = textWidth + buttonWidth - textNameWidth;
-    text(name, width/3 - textWidth - buttonWidth, height/7 + 4*textHeight);
-    textField1 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
-    textField1.setPromptText(player + "1");
-    text(left, width/3 - textWidth - buttonWidth, height/7 + 6*textHeight);
-    text(right, width/3 - textWidth - buttonWidth, height/7 + 8*textHeight);  
-    text(name, 2*width/3, height/7 + 4*textHeight);
-    textField2 = new GTextField(this, 2*width/3 + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
-    textField2.setPromptText(player + "2");
-    text(left, 2*width/3, height/7 + 6*textHeight);
-    text(right, 2*width/3, height/7 + 8*textHeight);
-    text(name, width/3 - textWidth - buttonWidth, height/2 + 4*textHeight); 
-    textField3 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
-    textField3.setPromptText(player + "3");
-    text(left, width/3 - textWidth - buttonWidth, height/2 + 6*textHeight);
-    text(right, width/3 - textWidth - buttonWidth, height/2 + 8*textHeight);  
-    text(name, 2*width/3, height/2 + 4*textHeight);
-    textField4 = new GTextField(this, 2*width/3 + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
-    textField4.setPromptText(player + "4");
-    text(left, 2*width/3, height/2 + 6*textHeight);
-    text(right, 2*width/3, height/2 + 8*textHeight);    
-   //button for players to choose keys
-    btnL1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "LIJEVO");
-    btnR1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "DESNO");
-    btnL2 = new GButton(this, 2*width/3 + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "A");
-    btnR2 = new GButton(this, 2*width/3 + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "D"); 
-    btnL3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "B");
-    btnR3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "M"); 
-    btnL4 = new GButton(this, 2*width/3 + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "4");
-    btnR4 = new GButton(this, 2*width/3 + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "6");   
-    
-    
-
-    float buttonRadius = width/10;
-    btnStart = new GButton(this, (width - buttonRadius)/2, 5*height/14 - buttonRadius/2, buttonRadius, buttonRadius, "START");
-    btnStart.setLocalColor(4, color(0, 255, 0));   
-    
-    textSize((height + width)/70);
-    textWidth = textWidth(rule1);
-    textHeight = textAscent() - textDescent();
-    text(rule1, (width - textWidth)/2, 6*height/7 + textHeight);
-    textWidth = textWidth(rule2);
-    text(rule2, (width - textWidth)/2, 6*height/7 + 3*textHeight);
-    
-    
-    fill(255, 0, 0);
-    textWidth = textWidth(chooseNumOfPlayers);
-    text(chooseNumOfPlayers, (width - textWidth)/2, 4*height/7 + textHeight);
-    buttonRadius = (textWidth - (height + width)/60)/3;
-    
-    btn2Players = new GButton(this, (width - textWidth)/2 , 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "2"); 
-    btn3Players = new GButton(this, (width - textWidth)/2 + (height + width)/120 + buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "3");
-    btn4Players = new GButton(this, (width -textWidth)/2 + (height + width)/60 + 2*buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "4");
-    btn2Players.setLocalColor(4, color(255, 0, 0));
-    btn3Players.setLocalColor(4, color(255, 0, 0));
-    btn4Players.setLocalColor(4, color(255, 0, 0));
-    btn2Players.setLocalColor(3, color(0, 0, 255));
-    btn3Players.setLocalColor(3, color(0, 0, 255));
-    btn4Players.setLocalColor(3, color(0, 0, 255));
-    
-
-    //looping but not well.. Not continuous
-    startSound.loop();
+    textFont(startPageFont); 
     
     rectMode(CORNERS);
     ellipseMode(RADIUS);
 
 }
 
-void draw() {   
+void movieEvent(Movie m) {
+     m.read();
+}
+
+void draw() {
+    if(playVideo) {
+        image(loadingVideo, 0, 0, width, height);
+    }
+    
+    if(millis() - startVideo > 1000 * loadingVideo.duration() && playVideo) {
+        playVideo = false;
+        setGradient(0, 0, width/2, height, b1, b2, 2);
+        setGradient(width/2, 0, width/2, height, b2, b1, 2);
+        drawTitleAndPlayers();  
+        drawStartAndChoosePlayers();    
+    
+        //looping but not well.. Not continuous
+        startSound.loop();
+    }
+      
     if(startCounter) {    
         startCountdown();
     }
@@ -176,11 +116,14 @@ void draw() {
         drawSideBar();
         for(Player p : listOfPlayers) 
             if(p.isAlive()) { 
-                Move(p);
-                checkIfCollision(p);
-                checkIfKeysPressed(p);
-            }        
-        drawAllPlayersCurrentPositions();
+                for(int i = 0; i < p.getSpeed(); i++) {
+                    move(p);
+                    checkIfCollision(p);
+                    checkIfKeysPressed(p);
+                    drawPlayersCurrentPosition(p);
+                }
+            }
+        drawBooster();
     }
 }
 
@@ -215,6 +158,8 @@ private void startCountdown() {
         drawBackground(blackScreen);
         drawPlayingArea();
         startRound = true;
+        startInterval = 3;
+        startTime = millis();
     }
 }
 
@@ -222,7 +167,7 @@ private void startCountdown() {
 * Moving player. Called only in draw method.
 * Depending on player direction calculates new x and y values.
 */
-private void Move(Player player) {
+private void move(Player player) {
     int x = int(player.getSize() * cos(player.getDirection()));
     int y = int(player.getSize() * -sin(player.getDirection()));
     player.setX(player.getX() + x);
@@ -231,7 +176,7 @@ private void Move(Player player) {
 
 /*
 * Plays a sound and prepares it to play again (rewind).
-*/ //<>//
+*/
 private void playSound(AudioPlayer sound) {
     sound.play();
     sound.rewind();
@@ -252,7 +197,7 @@ void mousePressed() {
         playerThree.getListOfPassedPoints().clear();
         playerFour.getListOfPassedPoints().clear();
         startInterval = secondsToStart;
-        frontPage = false;
+        boosterShown = false;
     } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
         if(!endOfGame) {
             blackScreen = true;

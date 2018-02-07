@@ -68,24 +68,16 @@ private void drawPlayerScore(Player player, float distance) {
     text(player.getScore(), 6*width/7 + textWidth(player.getName()+ ": "), height/3 + distance);
 }
 
-
-/*
-* Go through all players and draw current position of all alive players.
-*/
-void drawAllPlayersCurrentPositions() {
-    for(Player p : listOfPlayers) {
-        if(p.isAlive()) drawPlayersCurrentPosition(p);
-    }
-}
-
 /*
 * Draw one player current position and update his listOfPassedPoints.
 */
 private void drawPlayersCurrentPosition(Player player) {
-    fill(player.getColor());
-    stroke(player.getColor());
-    ellipse(player.getX(), player.getY(), player.getSize(), player.getSize());
-    player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
+    if(player.isAlive()) {
+        fill(player.getColor());
+        stroke(player.getColor());   
+        ellipse(player.getX(), player.getY(), player.getSize(), player.getSize());
+        player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
+    }
 }
 
 /*
@@ -123,4 +115,125 @@ private void drawAgainButton() {
     float textHeight = textAscent() - textDescent();
     float textWidth = textWidth("Nastavi!");
     text("Nastavi!", 11*width/12 - textWidth/2, height*0.8 + textHeight/2);  
+}
+
+private void drawBooster() {
+    if(millis() - startTime > 1000 && startInterval > 0 && !boosterShown) {
+            startTime = millis();
+            startInterval--;
+    }
+        
+    if(startInterval == 0 && !boosterShown) {
+        float u = random(0, 1);
+        float v = random(0, 1);
+        float t = 2 * PI * v;
+        doubleSpeedBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
+        doubleSpeedBoosterY = int(sqrt(v) * -sin(t) * height/2);
+        fill(127);
+        stroke(127);
+        ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 5, 5);
+        startInterval = 8;
+        boosterShown = true;
+    }     
+}
+
+/*
+* Draws titles and players in their positions on start screen. Called after video ends.
+*/
+private void drawTitleAndPlayers() {
+    fill(0, 0, 255);   
+    textSize((height + width)/50);
+    textWidth = textWidth(title);
+    textHeight = textAscent() - textDescent();
+    text(title, (width - textWidth)/2, height/7 - textHeight);
+      
+    float buttonWidth = width/20;
+    float buttonHeight = textHeight;
+    
+    textSize((height + width)/70);
+    textWidth = textWidth(chooseColor);
+    textHeight = textAscent() - textDescent();
+    
+    fill(0, 0, 120);
+    textSize((height + width)/60); 
+    fill(playerOne.getColor());
+    text(player + "1", width/3 - textWidth - buttonWidth, height/7 + textAscent() - textDescent());  
+    fill(playerTwo.getColor());
+    text(player + "2", 2*width/3, height/7 + textAscent() - textDescent());    
+    fill(playerThree.getColor());
+    text(player + "3", width/3 - textWidth - buttonWidth, height/2 + textAscent() - textDescent());
+    fill(playerFour.getColor());
+    text(player + "4", 2*width/3, height/2 + textAscent() - textDescent());
+    
+    fill(0, 0, 120);
+    textSize((height + width)/70);
+    textWidth = textWidth(chooseColor);
+    textHeight = textAscent() - textDescent();
+    float textNameWidth = textWidth(name);
+    float textFieldWidth = textWidth + buttonWidth - textNameWidth;
+    text(name, width/3 - textWidth - buttonWidth, height/7 + 4*textHeight);
+    text(left, width/3 - textWidth - buttonWidth, height/7 + 6*textHeight);
+    text(right, width/3 - textWidth - buttonWidth, height/7 + 8*textHeight);  
+    text(name, 2*width/3, height/7 + 4*textHeight);
+    text(left, 2*width/3, height/7 + 6*textHeight);
+    text(right, 2*width/3, height/7 + 8*textHeight);
+    text(name, width/3 - textWidth - buttonWidth, height/2 + 4*textHeight);
+    text(left, width/3 - textWidth - buttonWidth, height/2 + 6*textHeight);
+    text(right, width/3 - textWidth - buttonWidth, height/2 + 8*textHeight);  
+    text(name, 2*width/3, height/2 + 4*textHeight);
+    
+    text(left, 2*width/3, height/2 + 6*textHeight);
+    text(right, 2*width/3, height/2 + 8*textHeight);  
+    
+    textField1 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
+    textField1.setPromptText(player + "1");
+    textField2 = new GTextField(this, 2*width/3 + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
+    textField2.setPromptText(player + "2");
+    textField3 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
+    textField3.setPromptText(player + "3");
+    textField4 = new GTextField(this, 2*width/3 + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
+    textField4.setPromptText(player + "4");
+    
+    //button for players to choose keys
+    btnL1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "LIJEVO");
+    btnR1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "DESNO");
+    btnL2 = new GButton(this, 2*width/3 + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "A");
+    btnR2 = new GButton(this, 2*width/3 + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "D"); 
+    btnL3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "B");
+    btnR3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "M"); 
+    btnL4 = new GButton(this, 2*width/3 + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "4");
+    btnR4 = new GButton(this, 2*width/3 + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "6"); 
+    
+}
+
+/*
+* Draws start button and buttons to choose 2,3 or 4 players. Called after video ends.
+*/
+private void drawStartAndChoosePlayers() {
+    float buttonRadius = width/10;
+    btnStart = new GButton(this, (width - buttonRadius)/2, 5*height/14 - buttonRadius/2, buttonRadius, buttonRadius, "START");
+    btnStart.setLocalColor(4, color(0, 255, 0));   
+    
+    textSize((height + width)/70);
+    textWidth = textWidth(rule1);
+    textHeight = textAscent() - textDescent();
+    text(rule1, (width - textWidth)/2, 6*height/7 + textHeight);
+    textWidth = textWidth(rule2);
+    text(rule2, (width - textWidth)/2, 6*height/7 + 3*textHeight);
+    
+    
+    fill(255, 0, 0);
+    textWidth = textWidth(chooseNumOfPlayers);
+    text(chooseNumOfPlayers, (width - textWidth)/2, 4*height/7 + textHeight);
+    buttonRadius = (textWidth - (height + width)/60)/3;
+    
+    btn2Players = new GButton(this, (width - textWidth)/2 , 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "2"); 
+    btn3Players = new GButton(this, (width - textWidth)/2 + (height + width)/120 + buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "3");
+    btn4Players = new GButton(this, (width -textWidth)/2 + (height + width)/60 + 2*buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "4");
+    btn2Players.setLocalColor(4, color(255, 0, 0));
+    btn3Players.setLocalColor(4, color(255, 0, 0));
+    btn4Players.setLocalColor(4, color(255, 0, 0));
+    btn2Players.setLocalColor(3, color(0, 0, 255));
+    btn3Players.setLocalColor(3, color(0, 0, 255));
+    btn4Players.setLocalColor(3, color(0, 0, 255));
 }

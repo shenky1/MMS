@@ -158,6 +158,26 @@ private void drawSizeBooster() {
     }     
 }
 
+private void drawChangeKeysBooster() {
+    if(millis() - changeKeysStartTime > 1000 && startChangeKeysBoosterInterval > 0 && !changeKeysBoosterShown) {
+            changeKeysStartTime = millis();
+            startChangeKeysBoosterInterval--;
+    }
+        
+    if(startChangeKeysBoosterInterval == 0 && !changeKeysBoosterShown) {
+        float u = random(0, 1);
+        float v = random(0, 1);
+        float t = 2 * PI * v;
+        changeKeysBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
+        changeKeysBoosterY = int(sqrt(v) * -sin(t) * height/2);
+        fill(255, 0, 255);
+        stroke(255, 0, 255);
+        ellipse(5*width/12 + changeKeysBoosterX, height/2 + changeKeysBoosterY, 5, 5);
+        startChangeKeysBoosterInterval = 8;
+        changeKeysBoosterShown = true;
+    }     
+}
+
 /*
 * Draws titles and players in their positions on start screen. Called after video ends.
 */

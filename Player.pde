@@ -60,7 +60,11 @@ class Player {
     *  Tells us if right key was pressed.
     */
     private boolean rightPressed;
-  
+    /*
+    *  Tells us if keys were changed.
+    */
+    private boolean keysChanged;
+    
     /*
     * Constructor.
     */
@@ -207,5 +211,21 @@ class Player {
     
     public void setRightPressed(boolean rightPressed) {
         this.rightPressed = rightPressed;
+    }
+    
+    public boolean isKeysChanged() {
+        return keysChanged;
+    }
+    
+    public void setKeysChanged(boolean keysChanged) {
+       this.keysChanged = keysChanged;
+       
+    }
+    
+    public void changeKeys() {
+        int changeKey = left;
+        left = right;
+        right = changeKey;   
+        keysChanged = !keysChanged;
     }
 }

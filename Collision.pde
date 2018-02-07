@@ -56,7 +56,19 @@ private boolean hasCrashed(Player player) {
                      }
                      sizeBoosterShown = false;
                  }
-             } else {
+             } else if (hue(col) == hue(color(255, 0, 255))) {
+                 if(changeKeysBoosterShown) {
+                     fill(255);
+                     stroke(255);
+                     ellipse(5*width/12 + changeKeysBoosterX, height/2 + changeKeysBoosterY, 5, 5);
+                     for(Player p : listOfPlayers) {
+                         if(p != player) {
+                             p.changeKeys();
+                         }
+                     }
+                     changeKeysBoosterShown = false;
+                 }
+             }else {
                  return true;
              }
          }

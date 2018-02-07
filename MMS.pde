@@ -15,6 +15,7 @@ boolean blackScreen = false; // do I want black board or white
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
 boolean speedBoosterShown = false;
 boolean sizeBoosterShown = false;
+boolean changeKeysBoosterShown = false;
 boolean playVideo;
 
 float textWidth;
@@ -31,6 +32,8 @@ int speedBoosterX;
 int speedBoosterY;
 int sizeBoosterX;
 int sizeBoosterY;
+int changeKeysBoosterX;
+int changeKeysBoosterY;
 
 ArrayList<Player> listOfPlayers;
 
@@ -38,9 +41,11 @@ int secondsToStart = 4; // one bigger than it really is
 int startInterval; // counter
 int startSpeedBoosterInterval;
 int startSizeBoosterInterval;
+int startChangeKeysBoosterInterval;
 float startTime; // time calculated with millis() when button is pressed.. Used for countdown
 float sizeStartTime;
 float speedStartTime;
+float changeKeysStartTime;
 
 //colors for gradient.. Copied from internet
 color b1 = color(255);
@@ -69,7 +74,7 @@ void setup() {
     playerOne = new Player(37, 39, color(255, 0, 0), new Pair(int(textWidth("POBJEDNIK!")/2), height/12)); // <-, ->
     playerTwo = new Player(65, 68, color(0, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), height/12)); // A, D
     playerThree = new Player(66, 77, color(0, 255, 0), new Pair(int(textWidth("POBJEDNIK!")/2), 17*height/18)); // B,M
-    playerFour = new Player(52, 54, color(255, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), 17*height/18)); // 4, 6
+    playerFour = new Player(52, 54, color(165, 20, 140), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), 17*height/18)); // 4, 6
 
     listOfPlayers = new ArrayList<Player>();
     listOfPlayers.add(playerOne);
@@ -132,6 +137,7 @@ void draw() {
             }
         drawSpeedBooster();
         drawSizeBooster();
+        drawChangeKeysBooster();
     }
 }
 
@@ -168,8 +174,10 @@ private void startCountdown() {
         startRound = true;
         startSizeBoosterInterval = 3;
         startSpeedBoosterInterval = 3;
+        startChangeKeysBoosterInterval = 3;
         speedStartTime = millis();
         sizeStartTime = millis();
+        changeKeysStartTime = millis();
     }
 }
 
@@ -209,9 +217,14 @@ void mousePressed() {
         startInterval = secondsToStart;
         speedBoosterShown = false;
         sizeBoosterShown = false;
+        changeKeysBoosterShown = false;
         for(Player p : listOfPlayers) {
             p.setSpeed(1);
             p.setSize(5);
+            if(p.isKeysChanged()) {
+                p.changeKeys();
+                
+            }
         }
     } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
         if(!endOfGame) {

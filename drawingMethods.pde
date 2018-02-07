@@ -129,8 +129,8 @@ private void drawBooster() {
         float t = 2 * PI * v;
         doubleSpeedBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
         doubleSpeedBoosterY = int(sqrt(v) * -sin(t) * height/2);
-        fill(127);
-        stroke(127);
+        fill(255, 255, 0);
+        stroke(255, 255, 0);
         ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 5, 5);
         startInterval = 8;
         boosterShown = true;

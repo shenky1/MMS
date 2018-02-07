@@ -198,6 +198,9 @@ void mousePressed() {
         playerFour.getListOfPassedPoints().clear();
         startInterval = secondsToStart;
         boosterShown = false;
+        for(Player p : listOfPlayers) {
+            p.setSpeed(1);
+        }
     } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
         if(!endOfGame) {
             blackScreen = true;

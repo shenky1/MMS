@@ -32,11 +32,15 @@ private boolean hasCrashed(Player player) {
          int yToCheck = int(player.getY() + player.getSize() * -sin(directionStart));
          color col = get(xToCheck, yToCheck);
          if(col != color(255) && col != color(0)) {
-             if(col == color(127)) {
+             if(hue(col) == hue(color(255, 255, 0))) {
                  fill(255);
                  stroke(255);
-                 ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 6, 6);
-                 player.setSpeed(player.getSpeed() + 1);
+                 ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 5, 5);
+                 for(Player p : listOfPlayers) {
+                     if(p != player) {
+                         p.setSpeed(p.getSpeed() + 1);
+                     }
+                 }
                  boosterShown = false;
              } else {
                  return true;

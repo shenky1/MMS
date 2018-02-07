@@ -117,23 +117,44 @@ private void drawAgainButton() {
     text("Nastavi!", 11*width/12 - textWidth/2, height*0.8 + textHeight/2);  
 }
 
-private void drawBooster() {
-    if(millis() - startTime > 1000 && startInterval > 0 && !boosterShown) {
-            startTime = millis();
-            startInterval--;
+private void drawSpeedBooster() {
+    if(millis() - speedStartTime > 1000 && startSpeedBoosterInterval > 0 && !speedBoosterShown) {
+            speedStartTime = millis();
+            startSpeedBoosterInterval--;
     }
         
-    if(startInterval == 0 && !boosterShown) {
+    if(startSpeedBoosterInterval == 0 && !speedBoosterShown) {
         float u = random(0, 1);
         float v = random(0, 1);
         float t = 2 * PI * v;
-        doubleSpeedBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
-        doubleSpeedBoosterY = int(sqrt(v) * -sin(t) * height/2);
+        speedBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
+        speedBoosterY = int(sqrt(v) * -sin(t) * height/2);
         fill(255, 255, 0);
         stroke(255, 255, 0);
-        ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 5, 5);
-        startInterval = 8;
-        boosterShown = true;
+        ellipse(5*width/12 + speedBoosterX, height/2 + speedBoosterY, 5, 5);
+        startSpeedBoosterInterval = 8;
+        speedBoosterShown = true;
+    }     
+}
+
+
+private void drawSizeBooster() {
+    if(millis() - sizeStartTime > 1000 && startSizeBoosterInterval > 0 && !sizeBoosterShown) {
+            sizeStartTime = millis();
+            startSizeBoosterInterval--;
+    }
+        
+    if(startSizeBoosterInterval == 0 && !sizeBoosterShown) {
+        float u = random(0, 1);
+        float v = random(0, 1);
+        float t = 2 * PI * v;
+        sizeBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
+        sizeBoosterY = int(sqrt(v) * -sin(t) * height/2);
+        fill(0, 255, 255);
+        stroke(0, 255, 255);
+        ellipse(5*width/12 + sizeBoosterX, height/2 + sizeBoosterY, 5, 5);
+        startSizeBoosterInterval = 8;
+        sizeBoosterShown = true;
     }     
 }
 

@@ -33,15 +33,29 @@ private boolean hasCrashed(Player player) {
          color col = get(xToCheck, yToCheck);
          if(col != color(255) && col != color(0)) {
              if(hue(col) == hue(color(255, 255, 0))) {
-                 fill(255);
-                 stroke(255);
-                 ellipse(5*width/12 + doubleSpeedBoosterX, height/2 + doubleSpeedBoosterY, 5, 5);
-                 for(Player p : listOfPlayers) {
-                     if(p != player) {
-                         p.setSpeed(p.getSpeed() + 1);
+                 if(speedBoosterShown) {
+                     fill(255);
+                     stroke(255);
+                     ellipse(5*width/12 + speedBoosterX, height/2 + speedBoosterY, 5, 5);
+                     for(Player p : listOfPlayers) {
+                         if(p != player) {
+                             p.setSpeed(p.getSpeed() + 1);
+                         }
                      }
+                     speedBoosterShown = false;
                  }
-                 boosterShown = false;
+             } else if (hue(col) == hue(color(0, 255, 255))) {
+                 if(sizeBoosterShown) {
+                     fill(255);
+                     stroke(255);
+                     ellipse(5*width/12 + sizeBoosterX, height/2 + sizeBoosterY, 5, 5);
+                     for(Player p : listOfPlayers) {
+                         if(p != player) {
+                             p.setSize(2*p.getSize());
+                         }
+                     }
+                     sizeBoosterShown = false;
+                 }
              } else {
                  return true;
              }

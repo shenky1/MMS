@@ -13,7 +13,8 @@ boolean startCounter = false;  // used for countdown
 boolean frontPage = true; // am I on front page
 boolean blackScreen = false; // do I want black board or white
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
-boolean boosterShown = false;
+boolean speedBoosterShown = false;
+boolean sizeBoosterShown = false;
 boolean playVideo;
 
 float textWidth;
@@ -26,14 +27,20 @@ int numOfPointsForWin = 30; //final number of points to win
 
 Player playerOne, playerTwo, playerThree, playerFour;
 
-int doubleSpeedBoosterX;
-int doubleSpeedBoosterY;
+int speedBoosterX;
+int speedBoosterY;
+int sizeBoosterX;
+int sizeBoosterY;
 
 ArrayList<Player> listOfPlayers;
 
 int secondsToStart = 4; // one bigger than it really is
-int startInterval; // counter 
+int startInterval; // counter
+int startSpeedBoosterInterval;
+int startSizeBoosterInterval;
 float startTime; // time calculated with millis() when button is pressed.. Used for countdown
+float sizeStartTime;
+float speedStartTime;
 
 //colors for gradient.. Copied from internet
 color b1 = color(255);
@@ -123,7 +130,8 @@ void draw() {
                     drawPlayersCurrentPosition(p);
                 }
             }
-        drawBooster();
+        drawSpeedBooster();
+        drawSizeBooster();
     }
 }
 
@@ -158,8 +166,10 @@ private void startCountdown() {
         drawBackground(blackScreen);
         drawPlayingArea();
         startRound = true;
-        startInterval = 3;
-        startTime = millis();
+        startSizeBoosterInterval = 3;
+        startSpeedBoosterInterval = 3;
+        speedStartTime = millis();
+        sizeStartTime = millis();
     }
 }
 
@@ -197,9 +207,11 @@ void mousePressed() {
         playerThree.getListOfPassedPoints().clear();
         playerFour.getListOfPassedPoints().clear();
         startInterval = secondsToStart;
-        boosterShown = false;
+        speedBoosterShown = false;
+        sizeBoosterShown = false;
         for(Player p : listOfPlayers) {
             p.setSpeed(1);
+            p.setSize(5);
         }
     } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
         if(!endOfGame) {
@@ -264,6 +276,7 @@ void keyPressed() {
             }
         }
     } else {
+      if(!playVideo) {
         setPlayerKeys(playerOne, btnL1, Turn.LEFT);
         setPlayerKeys(playerOne, btnR1, Turn.RIGHT);
         setPlayerKeys(playerTwo, btnL2, Turn.LEFT);
@@ -272,6 +285,7 @@ void keyPressed() {
         setPlayerKeys(playerThree, btnR3, Turn.RIGHT);
         setPlayerKeys(playerFour, btnL4, Turn.LEFT);
         setPlayerKeys(playerFour, btnR4, Turn.RIGHT);
+      }
     }
 }
 

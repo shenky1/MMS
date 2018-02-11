@@ -29,19 +29,38 @@ private void drawPlayingArea() {
 * Also shows buttons that change background.
 */
 private void drawSideBar() {
-    //white rectangle first
-    fill(255);
-    rect(5*width/6, 0, width, height);
-    
+   
+    image(oilCanvas, 5*width/6, 0, width, height);
+
+    fill(0);
+    stroke(0);
+    rect(5*width/6, 0, 5*width/6 + 5, height);
+
     //information about exit
     textSize((width + height)/60);
     fill(127, 0, 0);
-    text("Izlaz: esc", 6*width/7, height/10);
-
-    //current players' scores
-    text("Rezultat:", 6*width/7, height/3);
+    text("Izlaz: esc", 6*width/7, height/15);
+    
+    text("Legenda:", 6*width/7, height/5);
     textSize((width + height)/100);
     float textHeight = textAscent() - textDescent();
+    fill(speed.getColor());
+    drawStar(6*width/7, height/5 + 2*textHeight, 3, 8, 5);
+    text(" Ubrzaj igrače", 6*width/7 + 5, height/5 + 2*textHeight);
+    fill(size.getColor());
+    drawStar(6*width/7, height/5 + 4*textHeight, 3, 8, 5);
+    text(" Podebljaj igrače", 6*width/7 + 5, height/5 + 4*textHeight);
+    fill(changeKeys.getColor());
+    drawStar(6*width/7, height/5 + 6*textHeight, 3, 8, 5);
+    text(" Promjeni smjer", 6*width/7 + 5, height/5 + 6*textHeight);
+
+    
+    
+    fill(127, 0, 0);
+    //Curent players scores
+    textSize((width + height)/60);
+    text("Rezultat:", 6*width/7, height*0.4);
+    textSize((width + height)/100);
     drawPlayerScore(playerOne, 2*textHeight);
     drawPlayerScore(playerTwo, 4*textHeight);
     if(numOfPlayers == 3 ||numOfPlayers == 4) {
@@ -54,9 +73,10 @@ private void drawSideBar() {
     //buttons for black or white screen
     stroke(0, 0, 0);
     fill(255);
-    ellipse(width * 0.9  + width/30, height*0.2, width/60, width/60);
+    ellipse(width * 0.9  + width/30, height/9, width/60, width/60);
     fill(0);
-    ellipse(width * 0.9, height*0.2, width/60, width/60);
+    ellipse(width * 0.9, height/9, width/60, width/60);
+    
 }
 
 /*
@@ -64,8 +84,8 @@ private void drawSideBar() {
 */
 private void drawPlayerScore(Player player, float distance) {
     fill(player.getColor());
-    text(player.getName()+ ": ", 6*width/7, height/3 + distance);
-    text(player.getScore(), 6*width/7 + textWidth(player.getName()+ ": "), height/3 + distance);
+    text(player.getName()+ ": ", 6*width/7, height*0.4 + distance);
+    text(player.getScore(), 6*width/7 + textWidth(player.getName()+ ": "), height*0.4 + distance);
 }
 
 /*
@@ -98,10 +118,14 @@ private void drawWholePath(Player player) {
 void drawBackground(boolean blackScreen) {
     if(blackScreen) {
         fill(0);
+        stroke(255);
     } else {
         fill(255);
+        stroke(0);
     }
-    ellipse(5*width/12, height/2, 5*width/12, height/2);
+    strokeWeight(15);
+    ellipse(5*width/12, height/2, width/3, 3*height/7);
+    strokeWeight(1);
 }
 
 /*
@@ -109,74 +133,70 @@ void drawBackground(boolean blackScreen) {
 */
 private void drawAgainButton() {
     fill(0, 255, 0);
-    ellipse(11*width/12, height*0.8, width/20, width/20);
+    strokeWeight(3);
+    ellipse(11*width/12, height*0.85, width/20, width/20);
+    strokeWeight(1);
     fill(127, 0, 0);
     textSize((width + height)/70);
     float textHeight = textAscent() - textDescent();
     float textWidth = textWidth("Nastavi!");
-    text("Nastavi!", 11*width/12 - textWidth/2, height*0.8 + textHeight/2);  
+    text("Nastavi!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
 }
 
-private void drawSpeedBooster() {
-    if(millis() - speedStartTime > 1000 && startSpeedBoosterInterval > 0 && !speedBoosterShown) {
-            speedStartTime = millis();
-            startSpeedBoosterInterval--;
+
+private void initializeBooster(Booster booster, String methodName) {
+    if(millis() - booster.getStartTime() > 1000 && booster.getStartInterval() > 0 && !booster.getActive()) {
+            booster.setStartTime(millis());
+            booster.setStartInterval(booster.getStartInterval() - 1);
     }
         
-    if(startSpeedBoosterInterval == 0 && !speedBoosterShown) {
-        float u = random(0, 1);
-        float v = random(0, 1);
-        float t = 2 * PI * v;
-        speedBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
-        speedBoosterY = int(sqrt(v) * -sin(t) * height/2);
-        fill(255, 255, 0);
-        stroke(255, 255, 0);
-        ellipse(5*width/12 + speedBoosterX, height/2 + speedBoosterY, 5, 5);
-        startSpeedBoosterInterval = 8;
-        speedBoosterShown = true;
+    if(booster.getStartInterval() == 0 && !booster.getActive()) {
+        int x, y;
+        do {
+            float u = random(0, 1);
+            float v = random(0, 1);
+            float t = 2 * PI * v;
+            x = int(sqrt(u) * cos(t) * 3*width/10);
+            y = int(sqrt(u) * -sin(t) * 3*height/8);
+        } while(!available(5*width/12 + x, height/2 + y));
+        booster.setX(5*width/12 + x);
+        booster.setY(height/2 + y);
+        booster.setActive(true);
+        booster.setStartInterval(8);
+        try {
+            booster.setTask(MMS.class.getMethod(methodName, Player.class));
+        } catch(NoSuchMethodException e) {
+          println(e.getMessage()); //<>//
+        }
     }     
 }
 
-
-private void drawSizeBooster() {
-    if(millis() - sizeStartTime > 1000 && startSizeBoosterInterval > 0 && !sizeBoosterShown) {
-            sizeStartTime = millis();
-            startSizeBoosterInterval--;
-    }
-        
-    if(startSizeBoosterInterval == 0 && !sizeBoosterShown) {
-        float u = random(0, 1);
-        float v = random(0, 1);
-        float t = 2 * PI * v;
-        sizeBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
-        sizeBoosterY = int(sqrt(v) * -sin(t) * height/2);
-        fill(0, 255, 255);
-        stroke(0, 255, 255);
-        ellipse(5*width/12 + sizeBoosterX, height/2 + sizeBoosterY, 5, 5);
-        startSizeBoosterInterval = 8;
-        sizeBoosterShown = true;
-    }     
+private boolean available(int x, int y) {
+      for (int i = 0; i < width; i++) {
+          for (int j = 0; j < height; j++) {
+              if (dist(i, j, x, y) <= 100) {
+                  if(blackScreen) if(get(i, j) != color(0)) return false;
+                  else if(get(i,j) != color(255)) return false;
+              }
+          }
+      }
+      return true;
 }
 
-private void drawChangeKeysBooster() {
-    if(millis() - changeKeysStartTime > 1000 && startChangeKeysBoosterInterval > 0 && !changeKeysBoosterShown) {
-            changeKeysStartTime = millis();
-            startChangeKeysBoosterInterval--;
-    }
-        
-    if(startChangeKeysBoosterInterval == 0 && !changeKeysBoosterShown) {
-        float u = random(0, 1);
-        float v = random(0, 1);
-        float t = 2 * PI * v;
-        changeKeysBoosterX = int(sqrt(u) * cos(t) * 5*width/12);
-        changeKeysBoosterY = int(sqrt(v) * -sin(t) * height/2);
-        fill(255, 0, 255);
-        stroke(255, 0, 255);
-        ellipse(5*width/12 + changeKeysBoosterX, height/2 + changeKeysBoosterY, 5, 5);
-        startChangeKeysBoosterInterval = 8;
-        changeKeysBoosterShown = true;
-    }     
+private void drawBooster(Booster booster) {
+      pushMatrix();
+      fill(255);
+      stroke(255);
+      ellipse(booster.getX(), booster.getY(), 10, 10);
+      translate(booster.getX(), booster.getY());
+      rotate(frameCount / -10.0);
+      fill(booster.getColor());
+      stroke(booster.getColor());
+      drawStar(0, 0, 3, 8, 5); 
+      popMatrix();
 }
+
+
 
 /*
 * Draws titles and players in their positions on start screen. Called after video ends.
@@ -277,4 +297,22 @@ private void drawStartAndChoosePlayers() {
     btn2Players.setLocalColor(3, color(0, 0, 255));
     btn3Players.setLocalColor(3, color(0, 0, 255));
     btn4Players.setLocalColor(3, color(0, 0, 255));
+}
+
+/*
+* Draw a booster in a shape of a star
+*/
+void drawStar(float x, float y, float radius1, float radius2, int npoints) {
+  float angle = TWO_PI / npoints;
+  float halfAngle = angle/2.0;
+  beginShape();
+  for (float a = 0; a < TWO_PI; a += angle) {
+    float sx = x + cos(a) * radius2;
+    float sy = y + sin(a) * radius2;
+    vertex(sx, sy);
+    sx = x + cos(a+halfAngle) * radius1;
+    sy = y + sin(a+halfAngle) * radius1;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
 }

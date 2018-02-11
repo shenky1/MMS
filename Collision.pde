@@ -32,49 +32,55 @@ private boolean hasCrashed(Player player) {
          int yToCheck = int(player.getY() + player.getSize() * -sin(directionStart));
          color col = get(xToCheck, yToCheck);
          if(col != color(255) && col != color(0)) {
-             if(hue(col) == hue(color(255, 255, 0))) {
-                 if(speedBoosterShown) {
-                     fill(255);
-                     stroke(255);
-                     ellipse(5*width/12 + speedBoosterX, height/2 + speedBoosterY, 5, 5);
-                     for(Player p : listOfPlayers) {
-                         if(p != player) {
-                             p.setSpeed(p.getSpeed() + 1);
-                         }
-                     }
-                     speedBoosterShown = false;
-                 }
-             } else if (hue(col) == hue(color(0, 255, 255))) {
-                 if(sizeBoosterShown) {
-                     fill(255);
-                     stroke(255);
-                     ellipse(5*width/12 + sizeBoosterX, height/2 + sizeBoosterY, 5, 5);
-                     for(Player p : listOfPlayers) {
-                         if(p != player) {
-                             p.setSize(2*p.getSize());
-                         }
-                     }
-                     sizeBoosterShown = false;
-                 }
-             } else if (hue(col) == hue(color(255, 0, 255))) {
-                 if(changeKeysBoosterShown) {
-                     fill(255);
-                     stroke(255);
-                     ellipse(5*width/12 + changeKeysBoosterX, height/2 + changeKeysBoosterY, 5, 5);
-                     for(Player p : listOfPlayers) {
-                         if(p != player) {
-                             p.changeKeys();
-                         }
-                     }
-                     changeKeysBoosterShown = false;
-                 }
-             }else {
-                 return true;
+             if(hue(col) == hue(speed.getColor())) {
+                  removeBoosterAndDoTask(speed, player);
+             } else if(hue(col) == hue(size.getColor())) {
+                  removeBoosterAndDoTask(size, player);
+             } else if(hue(col) == hue(changeKeys.getColor())) {
+                  removeBoosterAndDoTask(changeKeys, player);
+             } else {
+                if(crashedIntoPlayer(col)) return true;
              }
+         } else if(grayPixel(col) || (col == color(0) && !blackScreen) || (col == color(255) && blackScreen))  {
+             int x = int(5*width/12 + (width/3 - 15) * cos(PI - player.getDirection()));
+             int y = int(height/2 + (3*height/7 - 15) * sin(PI - player.getDirection()));
+             player.setX(x); //<>//
+             player.setY(y);
+             return false;
          }
-         directionStart += PI/4;
+         directionStart += PI/8;
     }
     return false;
+}
+
+private boolean grayPixel (color p){
+  if(red(p) != 255 && red(p) != 0 && red(p) == green(p) && green(p) == blue(p)) { // R = G, G = B
+    return true;
+  }
+  return false;
+}
+
+private boolean crashedIntoPlayer(color col) {
+  for(Player p : listOfPlayers) {
+    if(col == p.getColor()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+private void removeBoosterAndDoTask(Booster booster, Player player) {
+     if(booster.getActive()) {
+         fill(255);
+         stroke(255);
+         ellipse(booster.getX(), booster.getY(), 10, 10);
+         try {
+             booster.getTask().invoke(this, player);
+         } catch(Exception e) {
+           println(e.getMessage()); //<>//
+         }
+         booster.setActive(false);
+     }
 }
 
 /*
@@ -91,12 +97,10 @@ private void announceRoundWinner(Player player) {
     float textHeight = textAscent() - textDescent();
     drawSideBar();
     fill(player.getColor());
-    text("Runda završena!", 6*width/7, height/2 + 2*textHeight);
-    text("Pobjednik:", 6*width/7, height/2 + 4*textHeight); 
-    text(player.getName(), 6*width/7, height/2 + 6*textHeight);
+    text("Runda završena!", 6*width/7, height*0.6 + 2*textHeight);
+    text("Pobjednik:", 6*width/7, height*0.6 + 4*textHeight); 
+    text(player.getName(), 6*width/7, height*0.6 + 6*textHeight);
     fill(255);
-    textSize(width/60);
-    text("POBJEDNIK!", player.getWinTextPosition().getX(), player.getWinTextPosition().getY());
     checkIfGameOver();
 }
 
@@ -139,4 +143,28 @@ private void announceFinalWinner(Player player) {
     playSound(endCheerSound);
     endOfGame = true;
     noLoop();
+}
+
+public void makeAllPlayersFasterExcept(Player player) {
+   for(Player p : listOfPlayers) {
+      if(p != player) {
+                 p.setSpeed(p.getSpeed() + 1);
+             }
+      }
+}
+
+public void makeAllPlayersBiggerExcept(Player player) {
+     for(Player p : listOfPlayers) {
+         if(p != player) {
+             p.setSize(3*p.getSize()/2);
+         }
+     }
+}
+
+public void makeAllPlayersChangeKeysExcept(Player player) {
+     for(Player p : listOfPlayers) {
+         if(p != player) {
+             p.changeKeys();
+         }
+     }
 }

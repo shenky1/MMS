@@ -77,9 +77,9 @@ private boolean isAvailable(char wishedKey) {
 */
 private void checkIfKeysPressed(Player p) {
     if(p.isLeftPressed()) {
-        p.setDirection(p.getDirection() + PI/30);
+        p.setDirection(p.getDirection() + PI/15);
     }
     if(p.isRightPressed()) {
-        p.setDirection(p.getDirection() - PI/30);
+        p.setDirection(p.getDirection() - PI/15);
     }
 }

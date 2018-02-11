@@ -37,10 +37,6 @@ class Player {
     */
     private int right;
     /*
-    *  In which corner to place win note when round is over. Shouldn't be member variable.
-    */
-    private Pair winTextPosition;
-    /*
     *  Current size of a player.
     */
     private int size;
@@ -85,7 +81,6 @@ class Player {
         this.left = left;
         this.right = right;
         this.col = col;
-        this.winTextPosition = winTextPosition;
     }
 
  
@@ -155,14 +150,6 @@ class Player {
     
     public void updateListOfPassedPoints(Pair p) {
         listOfPassedPoints.add(p);
-    }
-    
-    public Pair getWinTextPosition() {
-        return winTextPosition;
-    }
-    
-    public void setWinTextPosition(Pair winTextPosition) {
-        this.winTextPosition = winTextPosition;
     }
    
     public int getSize() {

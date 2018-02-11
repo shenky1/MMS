@@ -1,6 +1,7 @@
 import processing.video.*; //<>// //<>// //<>//
 import ddf.minim.*;
 import g4p_controls.*;
+import java.lang.reflect.Method;
 
 AudioPlayer crashSound, cheerSound, startSound, endCheerSound;
 Minim minim;//audio context
@@ -8,14 +9,14 @@ Minim minim;//audio context
 Movie loadingVideo;
 int startVideo;
 
+PImage colors; 
+PImage oilCanvas;
+
 boolean startRound = false; // start button
 boolean startCounter = false;  // used for countdown
 boolean frontPage = true; // am I on front page
 boolean blackScreen = false; // do I want black board or white
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
-boolean speedBoosterShown = false;
-boolean sizeBoosterShown = false;
-boolean changeKeysBoosterShown = false;
 boolean playVideo;
 
 float textWidth;
@@ -28,24 +29,13 @@ int numOfPointsForWin = 30; //final number of points to win
 
 Player playerOne, playerTwo, playerThree, playerFour;
 
-int speedBoosterX;
-int speedBoosterY;
-int sizeBoosterX;
-int sizeBoosterY;
-int changeKeysBoosterX;
-int changeKeysBoosterY;
-
 ArrayList<Player> listOfPlayers;
 
-int secondsToStart = 4; // one bigger than it really is
+int secondsToStart = 3;
 int startInterval; // counter
-int startSpeedBoosterInterval;
-int startSizeBoosterInterval;
-int startChangeKeysBoosterInterval;
 float startTime; // time calculated with millis() when button is pressed.. Used for countdown
-float sizeStartTime;
-float speedStartTime;
-float changeKeysStartTime;
+
+Booster speed, size, changeKeys;
 
 //colors for gradient.. Copied from internet
 color b1 = color(255);
@@ -60,20 +50,28 @@ GButton btnL1, btnR1, btnL2, btnR2, btnL3, btnR3, btnL4, btnR4;
 GButton btn2Players, btn3Players, btn4Players;
 GButton btnStart;
 
+Class[] parameterTypes;
+
 void setup() {
-  //  size(900,600);
+   // size(900,600);
     fullScreen();
     frameRate(20);
+
+    parameterTypes = new Class[1];
+    parameterTypes[0] = MMS.Player.class;
+    
+    colors = loadImage("colors.jpg");
+    oilCanvas = loadImage("oil canvas.jpg");
     
     loadingVideo = new Movie(this, "loadingVideo.mp4");
-    loadingVideo.play();
+   // loadingVideo.play();
     startVideo = millis();
     playVideo = true;
     
     textSize(width/60);
     playerOne = new Player(37, 39, color(255, 0, 0), new Pair(int(textWidth("POBJEDNIK!")/2), height/12)); // <-, ->
     playerTwo = new Player(65, 68, color(0, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), height/12)); // A, D
-    playerThree = new Player(66, 77, color(0, 255, 0), new Pair(int(textWidth("POBJEDNIK!")/2), 17*height/18)); // B,M
+    playerThree = new Player(66, 77, color(0, 100, 0), new Pair(int(textWidth("POBJEDNIK!")/2), 17*height/18)); // B,M
     playerFour = new Player(52, 54, color(165, 20, 140), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), 17*height/18)); // 4, 6
 
     listOfPlayers = new ArrayList<Player>();
@@ -88,6 +86,9 @@ void setup() {
     startSound = minim.loadFile("startMusic.mp3");
     endCheerSound = minim.loadFile("endCheer.mp3");    
  
+    size = new Booster(0, 0, color(255, 255, 0));
+    speed = new Booster(0, 0, color(0, 255, 255));
+    changeKeys = new Booster(0, 0, color(255, 0, 255));
     //initial number of players
     numOfPlayers = 2;
     playersLeft = 2;
@@ -95,30 +96,25 @@ void setup() {
     PFont startPageFont = createFont("CaviarDreams_Bold.ttf", 60);
     textFont(startPageFont); 
     
+    setGradient(0, 0, width/2, height, b1, b2, 2);
+    setGradient(width/2, 0, width/2, height, b2, b1, 2);
+    drawTitleAndPlayers();  
+    drawStartAndChoosePlayers();    
+    
+    //looping but not well.. Not continuous
+    startSound.loop();
+    
     rectMode(CORNERS);
     ellipseMode(RADIUS);
 
 }
 
-void movieEvent(Movie m) {
+/*void movieEvent(Movie m) {
      m.read();
 }
+*/
 
 void draw() {
-    if(playVideo) {
-        image(loadingVideo, 0, 0, width, height);
-    }
-    
-    if(millis() - startVideo > 1000 * loadingVideo.duration() && playVideo) {
-        playVideo = false;
-        setGradient(0, 0, width/2, height, b1, b2, 2);
-        setGradient(width/2, 0, width/2, height, b2, b1, 2);
-        drawTitleAndPlayers();  
-        drawStartAndChoosePlayers();    
-    
-        //looping but not well.. Not continuous
-        startSound.loop();
-    }
       
     if(startCounter) {    
         startCountdown();
@@ -134,10 +130,26 @@ void draw() {
                     checkIfKeysPressed(p);
                     drawPlayersCurrentPosition(p);
                 }
-            }
-        drawSpeedBooster();
-        drawSizeBooster();
-        drawChangeKeysBooster();
+            } 
+            try {
+                initializeBooster(speed, "makeAllPlayersFasterExcept");
+                initializeBooster(size, "makeAllPlayersBiggerExcept");
+                initializeBooster(changeKeys, "makeAllPlayersChangeKeysExcept");
+              } catch(Exception e) {
+                  println(e.getMessage());      
+          }
+          
+        if(speed.getActive()) {
+          drawBooster(speed);
+        }
+        
+        if(size.getActive()) {
+          drawBooster(size);
+        }
+        
+        if(changeKeys.getActive()) {
+          drawBooster(changeKeys);
+        }
     }
 }
 
@@ -147,11 +159,8 @@ void draw() {
 * When startInterval reaches 0 starts the game.
 */
 private void startCountdown() {
-    drawSideBar();
     if(millis() - startTime > 1000 && startInterval >= 0) {
-        drawPlayingArea();
         drawBackground(blackScreen);
-           
         for(Player p : listOfPlayers) {
             fill(p.getColor());
             stroke(p.getColor());
@@ -170,14 +179,13 @@ private void startCountdown() {
     if(startInterval == 0) {
         startCounter = false;
         drawBackground(blackScreen);
-        drawPlayingArea();
         startRound = true;
-        startSizeBoosterInterval = 3;
-        startSpeedBoosterInterval = 3;
-        startChangeKeysBoosterInterval = 3;
-        speedStartTime = millis();
-        sizeStartTime = millis();
-        changeKeysStartTime = millis();
+        size.setStartInterval(3);
+        speed.setStartInterval(3);
+        changeKeys.setStartInterval(3);
+        speed.setStartTime(millis());
+        size.setStartTime(millis());
+        changeKeys.setStartTime(millis());
     }
 }
 
@@ -204,36 +212,37 @@ private void playSound(AudioPlayer sound) {
 * Handles events for buttons that aren't from G4P library.
 */
 void mousePressed() {
-    if((!endOfGame && !startRound && !startCounter && overButton(11*width/12, height*0.8, width/20) && !frontPage)) {  
-        startSound.close();
-        drawBackground(blackScreen);
+    if((!endOfGame && !startRound && !startCounter && overButton(11*width/12, height*0.85, width/20) && !frontPage)) {  
         startCounter = true;  
         initializePlayersOnStart();
+        drawSideBar();
+        drawBackground(blackScreen);
+        startInterval = secondsToStart;
+        fill(127, 0, 0);
+        text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);    
         startTime = millis();
         playerOne.getListOfPassedPoints().clear();
         playerTwo.getListOfPassedPoints().clear();
         playerThree.getListOfPassedPoints().clear();
         playerFour.getListOfPassedPoints().clear();
-        startInterval = secondsToStart;
-        speedBoosterShown = false;
-        sizeBoosterShown = false;
-        changeKeysBoosterShown = false;
+        speed.setActive(false);
+        size.setActive(false);
+        changeKeys.setActive(false);
         for(Player p : listOfPlayers) {
             p.setSpeed(1);
             p.setSize(5);
             if(p.isKeysChanged()) {
-                p.changeKeys();
-                
+                p.changeKeys();   
             }
         }
-    } else if(overButton(width * 0.9, height * 0.2, width/60) && !frontPage) {
+    } else if(overButton(width * 0.9, height/9, width/60) && !frontPage) {
         if(!endOfGame) {
             blackScreen = true;
             drawBackground(blackScreen);
             for(Player p : listOfPlayers)
                 drawWholePath(p);
         }
-    } else if(overButton(width * 0.9 + 50, height * 0.2, width/60) && !frontPage) {
+    } else if(overButton(width * 0.9 + 50, height/9, width/60) && !frontPage) {
        if(!endOfGame) {
            blackScreen = false;
            drawBackground(blackScreen);
@@ -377,8 +386,13 @@ void handleButtonEvents(GButton button , GEvent event) {
         playerFour.getListOfPassedPoints().clear();
   
         startCounter = true;  
+        drawSideBar();
+        image(colors, 0, 0, 5*width/6, height);
+        drawBackground(blackScreen);
+        fill(127, 0, 0);        
         startTime = millis();
         startInterval = secondsToStart;
+        text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);    
     } else { 
         button.setFocus(true);
         if (button == btnL1 || button == btnL2 || button == btnL3 || button == btnL4 || button == btnR1 || button == btnR2 || button == btnR3 || button == btnR4) {

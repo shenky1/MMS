@@ -175,8 +175,9 @@ private boolean available(int x, int y) {
       for (int i = 0; i < width; i++) {
           for (int j = 0; j < height; j++) {
               if (dist(i, j, x, y) <= 100) {
-                  if(blackScreen) if(get(i, j) != color(0)) return false;
-                  else if(get(i,j) != color(255)) return false;
+                  color c = get(i, j);
+                  if(!blackScreen && c != color(255)) return false;
+                  if(blackScreen && c != color(0)) return false;
               }
           }
       }
@@ -185,8 +186,13 @@ private boolean available(int x, int y) {
 
 private void drawBooster(Booster booster) {
       pushMatrix();
-      fill(255);
-      stroke(255);
+      if(!blackScreen) {
+          fill(255);
+          stroke(255);
+      } else {
+          fill(0);
+          stroke(0);
+      }
       ellipse(booster.getX(), booster.getY(), 10, 10);
       translate(booster.getX(), booster.getY());
       rotate(frameCount / -10.0);

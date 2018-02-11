@@ -44,7 +44,7 @@ private boolean hasCrashed(Player player) {
          } else if(grayPixel(col) || (col == color(0) && !blackScreen) || (col == color(255) && blackScreen))  {
              int x = int(5*width/12 + (width/3 - 15) * cos(PI - player.getDirection()));
              int y = int(height/2 + (3*height/7 - 15) * sin(PI - player.getDirection()));
-             player.setX(x); //<>//
+             player.setX(x);
              player.setY(y);
              return false;
          }
@@ -71,8 +71,13 @@ private boolean crashedIntoPlayer(color col) {
 
 private void removeBoosterAndDoTask(Booster booster, Player player) {
      if(booster.getActive()) {
-         fill(255);
-         stroke(255);
+         if(blackScreen) {
+             fill(0);
+             stroke(0);
+         } else {
+             fill(255);
+             stroke(255);
+         }
          ellipse(booster.getX(), booster.getY(), 10, 10);
          try {
              booster.getTask().invoke(this, player);

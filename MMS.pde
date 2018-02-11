@@ -131,24 +131,24 @@ void draw() {
                     drawPlayersCurrentPosition(p);
                 }
             } 
-            try {
-                initializeBooster(speed, "makeAllPlayersFasterExcept");
-                initializeBooster(size, "makeAllPlayersBiggerExcept");
-                initializeBooster(changeKeys, "makeAllPlayersChangeKeysExcept");
-              } catch(Exception e) {
-                  println(e.getMessage());      
+        try {
+            initializeBooster(speed, "makeAllPlayersFasterExcept");
+            initializeBooster(size, "makeAllPlayersBiggerExcept");
+            initializeBooster(changeKeys, "makeAllPlayersChangeKeysExcept");
+          } catch(Exception e) {
+              println(e.getMessage());      
           }
           
-        if(speed.getActive()) {
-          drawBooster(speed);
-        }
-        
-        if(size.getActive()) {
-          drawBooster(size);
-        }
-        
-        if(changeKeys.getActive()) {
-          drawBooster(changeKeys);
+          if(speed.getActive()) {
+            drawBooster(speed); //<>//
+          }
+          
+          if(size.getActive()) {
+            drawBooster(size);
+          }
+          
+          if(changeKeys.getActive()) {
+            drawBooster(changeKeys);
         }
     }
 }

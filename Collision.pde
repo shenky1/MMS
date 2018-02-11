@@ -42,8 +42,10 @@ private boolean hasCrashed(Player player) {
                 if(crashedIntoPlayer(col)) return true;
              }
          } else if(grayPixel(col) || (col == color(0) && !blackScreen) || (col == color(255) && blackScreen))  {
-             int x = int(5*width/12 + (width/3 - 15) * cos(PI - player.getDirection()));
-             int y = int(height/2 + (3*height/7 - 15) * sin(PI - player.getDirection()));
+             int dx = 5*width/12 - xToCheck;
+             int dy = height/2 - yToCheck;
+             int x = int(xToCheck + 2*dx);
+             int y = int(yToCheck + 2*dy);
              player.setX(x);
              player.setY(y);
              return false;

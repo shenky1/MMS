@@ -9,15 +9,22 @@ Minim minim;//audio context
 Movie loadingVideo;
 int startVideo;
 
-PImage colors; 
-PImage oilCanvas;
+PImage redBackground, xmasBackground, dirtyPaperBackground, symmetricalBackground, currentBackground, oilCanvas, blueStamp, redStamp, greenStamp,
+       purpleStamp, snowTexture, blackTexture, parquetTexture, brownTexture, yellowTexture, currentTexture, frontPageBackground, newGameBackground;
+PGraphics mask1, mask2;
+
+PFont titleFont, menuFont, menuFontBold, normalFont;
 
 boolean startRound = false; // start button
 boolean startCounter = false;  // used for countdown
-boolean frontPage = true; // am I on front page
-boolean blackScreen = false; // do I want black board or white
+boolean frontScreen = true; // am I on front page
+boolean newGame = false;
 boolean endOfGame = false; // Any player reached numOfPointsToWin;
+boolean fillPlayerScreen = false;
+boolean betweenRounds;
+
 boolean playVideo;
+boolean player1Screen, player2Screen, player3Screen, player4Screen;
 
 float textWidth;
 float textHeight;
@@ -44,11 +51,10 @@ color c1 = color(204, 102, 0);
 color c2 = color(0, 102, 153);
 
 //choosing names
-GTextField textField1, textField2, textField3, textField4;
+GTextField nameField;
 
-GButton btnL1, btnR1, btnL2, btnR2, btnL3, btnR3, btnL4, btnR4;
+GButton btnLeft, btnRight;
 GButton btn2Players, btn3Players, btn4Players;
-GButton btnStart;
 
 Class[] parameterTypes;
 
@@ -56,23 +62,58 @@ void setup() {
    // size(900,600);
     fullScreen();
     frameRate(20);
-
+    
+    rectMode(CORNERS);
+    ellipseMode(RADIUS);
+    
     parameterTypes = new Class[1];
     parameterTypes[0] = MMS.Player.class;
     
-    colors = loadImage("colors.jpg");
-    oilCanvas = loadImage("oil canvas.jpg");
+    frontPageBackground = loadImage(dataPath("Pictures/frontPageBackground.png"));
+    newGameBackground = loadImage(dataPath("Pictures/newGameBackground.jpg"));
+    redBackground = loadImage(dataPath("Pictures/redBackground.jpg"));
+    xmasBackground = loadImage(dataPath("Pictures/christmasBackground.jpg"));
+    symmetricalBackground = loadImage(dataPath("Pictures/symmetricalBackground.png"));
+    dirtyPaperBackground = loadImage(dataPath("Pictures/dirtyPaperBackground.jpg"));
+    oilCanvas = loadImage(dataPath("Pictures/oil canvas.jpg"));
+    redStamp = loadImage(dataPath("Pictures/redStamp.png"));
+    blueStamp = loadImage(dataPath("Pictures/blueStamp.png"));
+    greenStamp = loadImage(dataPath("Pictures/greenStamp.png"));
+    purpleStamp = loadImage(dataPath("Pictures/purpleStamp.png"));
+    snowTexture = loadImage(dataPath("Pictures/snowTexture.jpg"));
+    blackTexture = loadImage(dataPath("Pictures/blackTexture.jpg"));
+    parquetTexture = loadImage(dataPath("Pictures/parquetTexture.jpg"));
+    yellowTexture = loadImage(dataPath("Pictures/yellowTexture.jpg"));
+    brownTexture = loadImage(dataPath("Pictures/brownTexture.jpg"));
     
-    loadingVideo = new Movie(this, "loadingVideo.mp4");
-   // loadingVideo.play();
-    startVideo = millis();
-    playVideo = true;
+    
+    snowTexture.resize(width, height);
+    blackTexture.resize(width, height);
+    brownTexture.resize(width, height);
+    parquetTexture.resize(width, height);
+    yellowTexture.resize(width, height);
+    
+    mask1 = createGraphics(snowTexture.width, snowTexture.height, JAVA2D);
+    mask1.beginDraw();
+    mask1.background(0);
+    mask1.fill(255);
+    mask1.noStroke();
+    mask1.ellipse(5*width/12, height/2, 2*width/3, 6*height/7);
+    mask1.endDraw();
+    
+    snowTexture.mask(mask1);
+    blackTexture.mask(mask1);
+    brownTexture.mask(mask1);
+    parquetTexture.mask(mask1);
+    yellowTexture.mask(mask1);
+
+    loadingVideo = new Movie(this, dataPath("Videos/loadingVideo.mp4"));
     
     textSize(width/60);
-    playerOne = new Player(37, 39, color(255, 0, 0), new Pair(int(textWidth("POBJEDNIK!")/2), height/12)); // <-, ->
-    playerTwo = new Player(65, 68, color(0, 0, 255), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), height/12)); // A, D
-    playerThree = new Player(66, 77, color(0, 100, 0), new Pair(int(textWidth("POBJEDNIK!")/2), 17*height/18)); // B,M
-    playerFour = new Player(52, 54, color(165, 20, 140), new Pair(int(6*width/7 - 2*textWidth("POBJEDNIK!")), 17*height/18)); // 4, 6
+    playerOne = new Player("Player 1", 37, 39, color(255, 0, 0)); // <-, ->
+    playerTwo = new Player("Player 2", 65, 68, color(0, 0, 255)); // A, D
+    playerThree = new Player("Player 3", 66, 77, color(0, 100, 0)); // B,M
+    playerFour = new Player("Player 4", 52, 54, color(165, 20, 140)); // 4, 6
 
     listOfPlayers = new ArrayList<Player>();
     listOfPlayers.add(playerOne);
@@ -81,40 +122,51 @@ void setup() {
     listOfPlayers.add(playerFour);
     
     minim = new Minim(this);
-    crashSound = minim.loadFile("crash.mp3");
-    cheerSound = minim.loadFile("cheer.mp3");
-    startSound = minim.loadFile("startMusic.mp3");
-    endCheerSound = minim.loadFile("endCheer.mp3");    
+    crashSound = minim.loadFile(dataPath("Sounds/crash.mp3"));
+    cheerSound = minim.loadFile(dataPath("Sounds/cheer.mp3"));
+    startSound = minim.loadFile(dataPath("Sounds/startMusic.mp3"));
+    endCheerSound = minim.loadFile(dataPath("Sounds/endCheer.mp3"));    
  
     size = new Booster(0, 0, color(255, 255, 0));
     speed = new Booster(0, 0, color(0, 255, 255));
     changeKeys = new Booster(0, 0, color(255, 0, 255));
+    
     //initial number of players
     numOfPlayers = 2;
     playersLeft = 2;
-    
-    PFont startPageFont = createFont("CaviarDreams_Bold.ttf", 60);
-    textFont(startPageFont); 
-    
-    setGradient(0, 0, width/2, height, b1, b2, 2);
-    setGradient(width/2, 0, width/2, height, b2, b1, 2);
-    drawTitleAndPlayers();  
-    drawStartAndChoosePlayers();    
-    
+   
+    titleFont = createFont(dataPath("Fonts/titleCurved2.otf"), height/10);
+    menuFont = createFont(dataPath("Fonts/menu.ttf"), height/13);
+    menuFontBold = createFont(dataPath("Fonts/menuBold.ttf"), height/13);
+    normalFont = createFont(dataPath("Fonts/CaviarDreams_Bold.ttf"), 60);
+
+    drawStartScreen();    
+
     //looping but not well.. Not continuous
     startSound.loop();
-    
-    rectMode(CORNERS);
-    ellipseMode(RADIUS);
+
 
 }
 
-/*void movieEvent(Movie m) {
+void movieEvent(Movie m) {
      m.read();
 }
-*/
+
 
 void draw() {
+  
+     if(playVideo) {
+         image(loadingVideo, 0, 0, width, height);
+     }
+     
+     if(millis() - startVideo > 1000 * loadingVideo.duration() && playVideo) {
+         playVideo = false;
+         startGame();
+     }
+  
+    if(frontScreen) {
+        updateMouse();
+    }
       
     if(startCounter) {    
         startCountdown();
@@ -160,7 +212,7 @@ void draw() {
 */
 private void startCountdown() {
     if(millis() - startTime > 1000 && startInterval >= 0) {
-        drawBackground(blackScreen);
+        drawBackground();
         for(Player p : listOfPlayers) {
             fill(p.getColor());
             stroke(p.getColor());
@@ -178,7 +230,7 @@ private void startCountdown() {
     
     if(startInterval == 0) {
         startCounter = false;
-        drawBackground(blackScreen);
+        drawBackground();
         startRound = true;
         size.setStartInterval(3);
         speed.setStartInterval(3);
@@ -194,8 +246,8 @@ private void startCountdown() {
 * Depending on player direction calculates new x and y values.
 */
 private void move(Player player) {
-    int x = int(player.getSize() * cos(player.getDirection()));
-    int y = int(player.getSize() * -sin(player.getDirection()));
+    int x = int(4 * cos(player.getDirection()));
+    int y = int(4 * -sin(player.getDirection()));
     player.setX(player.getX() + x);
     player.setY(player.getY() + y);
 }
@@ -212,11 +264,15 @@ private void playSound(AudioPlayer sound) {
 * Handles events for buttons that aren't from G4P library.
 */
 void mousePressed() {
-    if((!endOfGame && !startRound && !startCounter && overButton(11*width/12, height*0.85, width/20) && !frontPage)) {  
+    if(betweenRounds && overButton(11*width/12, height*0.85, width/20)) {  
+        betweenRounds = false;
         startCounter = true;  
         initializePlayersOnStart();
+        chooseBackgroundRandomly();
+        image(currentBackground, 0, 0, 5*width/6, height);
         drawSideBar();
-        drawBackground(blackScreen);
+        chooseTextureRandomly();
+        drawBackground();
         startInterval = secondsToStart;
         fill(127, 0, 0);
         text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);    
@@ -235,20 +291,85 @@ void mousePressed() {
                 p.changeKeys();   
             }
         }
-    } else if(overButton(width * 0.9, height/9, width/60) && !frontPage) {
-        if(!endOfGame) {
-            blackScreen = true;
-            drawBackground(blackScreen);
-            for(Player p : listOfPlayers)
-                drawWholePath(p);
-        }
-    } else if(overButton(width * 0.9 + 50, height/9, width/60) && !frontPage) {
-       if(!endOfGame) {
-           blackScreen = false;
-           drawBackground(blackScreen);
-           for(Player p : listOfPlayers)
-              drawWholePath(p);
-       }
+    } else if(frontScreen) checkIfMouseAboveMenu(); 
+    else if(newGame && get(mouseX, mouseY) == color(255,255,0)) {
+      frontScreen = true;
+      newGame = false;
+      drawStartScreen();
+      btn2Players.setVisible(false);
+      btn3Players.setVisible(false);
+      btn4Players.setVisible(false);
+    } else if(get(mouseX, mouseY) == color(255,220,0) && newGame) {
+          newGame = false;
+          player1Screen = true;
+          btn2Players.setVisible(false);
+          btn3Players.setVisible(false);
+          btn4Players.setVisible(false);
+          nameField.setVisible(true);
+          btnLeft.setVisible(true);
+          btnRight.setVisible(true);
+          drawScreenPlayer(1);
+    } else if(player1Screen && get(mouseX, mouseY) == color(255,255,0)) {
+          newGame = true;
+          player1Screen = false;
+          playerOne.setName(nameField.getText().isEmpty() ? "Player 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+          nameField.setVisible(false);
+          btnLeft.setVisible(false);
+          btnRight.setVisible(false);
+          drawNewGameScreen();
+    } else if(player1Screen && get(mouseX, mouseY) == color(255,220,0)) {
+         player2Screen = true;
+         player1Screen = false;
+         playerOne.setName(nameField.getText().isEmpty() ? "Player 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(2);
+    } else if(player2Screen && get(mouseX, mouseY) == color(255,255,0)) {
+         player2Screen = false;
+         player1Screen = true;
+         playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(1);
+    } else if(player2Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
+         player3Screen = true;
+         player2Screen = false;
+         playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(3);
+    } else if(player3Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
+         player3Screen = false;
+         player2Screen = true;
+         playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(2);
+    } else if(player3Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
+         player4Screen = true;
+         player3Screen = false;
+         playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(4);
+    } else if(player4Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
+         player3Screen = true;
+         player4Screen = false;
+         playerFour.setName(nameField.getText().isEmpty() ? "Player 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         drawScreenPlayer(3);
+    } else if(!startRound && get(mouseX, mouseY) == color(255, 255, 1) ||  get(mouseX, mouseY) == color(200, 0, 1)) {
+      if(player2Screen) {
+        playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        startSound.close();
+        loadingVideo.play();
+        startVideo = millis();
+        playVideo = true;
+      } else if(player3Screen) {
+        playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        startSound.close();
+        loadingVideo.play();
+        startVideo = millis();
+        playVideo = true;     
+      } else if(player4Screen) {
+        playerFour.setName(nameField.getText().isEmpty() ? "Player 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        loadingVideo.play();
+        startSound.close();
+        startVideo = millis();
+        playVideo = true;  
+      }
+        nameField.setVisible(false);
+        btnLeft.setVisible(false);
+        btnRight.setVisible(false);
     }
 }
 
@@ -261,35 +382,11 @@ boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)
 }
 
 /*
-* Set gradient on front screen.
-* (Background color).
-*/
-private void setGradient(int x, int y, float w, float h, color c1, color c2, int axis ) {
-    noFill();
-    if (axis == 1) {  // Top to bottom gradient
-        for (int i = y; i <= y+h; i++) {
-            float inter = map(i, y, y+h, 0, 1);
-            color c = lerpColor(c1, c2, inter);
-            stroke(c);
-            line(x, i, x+w, i);
-        }
-    } else if (axis == 2) {  // Left to right gradient
-        for (int i = x; i <= x+w; i++) {
-            float inter = map(i, x, x+w, 0, 1);
-            color c = lerpColor(c1, c2, inter);
-            stroke(c);
-            line(i, y, i, y+h);
-        }
-    }
-}
-
-
-/*
 * If in game key or keyCode equals to any player's left or right key. Set boolean variable of a player that his left or right key is not pressed anymore (released).
 * If start screen adjusts buttons' text and set players' new keys.
 */
 void keyPressed() {
-    if(!frontPage) {
+    if(startRound) {
         for(Player player : listOfPlayers) {
             if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
                 player.setLeftPressed(true);
@@ -298,24 +395,28 @@ void keyPressed() {
             }
         }
     } else {
-      if(!playVideo) {
-        setPlayerKeys(playerOne, btnL1, Turn.LEFT);
-        setPlayerKeys(playerOne, btnR1, Turn.RIGHT);
-        setPlayerKeys(playerTwo, btnL2, Turn.LEFT);
-        setPlayerKeys(playerTwo, btnR2, Turn.RIGHT);
-        setPlayerKeys(playerThree, btnL3, Turn.LEFT);
-        setPlayerKeys(playerThree, btnR3, Turn.RIGHT);
-        setPlayerKeys(playerFour, btnL4, Turn.LEFT);
-        setPlayerKeys(playerFour, btnR4, Turn.RIGHT);
-      }
+        if(player1Screen) {
+            setPlayerKeys(playerOne, btnLeft, Turn.LEFT);
+            setPlayerKeys(playerOne, btnRight, Turn.RIGHT);
+        } else if(player2Screen) {
+            setPlayerKeys(playerTwo, btnLeft, Turn.LEFT);
+            setPlayerKeys(playerTwo, btnRight, Turn.RIGHT);
+        } else if(player3Screen) {
+            setPlayerKeys(playerThree, btnLeft, Turn.LEFT);
+            setPlayerKeys(playerThree, btnRight, Turn.RIGHT);
+        } else if(player4Screen) {
+            setPlayerKeys(playerFour, btnLeft, Turn.LEFT);
+            setPlayerKeys(playerFour, btnRight, Turn.RIGHT);
+        }
     }
 }
+
 
 /*
 * If key or keyCode equals to any player's left or right key. Set boolean variable of a player that his left or right key is not pressed anymore (released).
 */
 void keyReleased() {
-    if(!frontPage) {
+    if(!frontScreen) {
         for(Player player : listOfPlayers) {
             if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
                 player.setLeftPressed(false);
@@ -350,53 +451,30 @@ void handleButtonEvents(GButton button , GEvent event) {
         btn3Players.setLocalColor(4, color(255, 0, 0));
         btn4Players.setLocalColor(4, color(0, 255, 0));
         numOfPlayers = 4;
-        playersLeft = 4;
-    } else if (button == btnStart) {
-        background(255);
-        startSound.close();
-        frontPage = false;
-        
-        playerOne.setName(textField1.getText().isEmpty() ? "Igrač 1" : textField1.getText().length() > 8 ? textField1.getText().substring(0,8) : textField1.getText());
-        textField1.setVisible(false);
-        playerTwo.setName(textField2.getText().isEmpty() ? "Igrač 2" : textField2.getText().length() > 8 ? textField2.getText().substring(0,8) : textField2.getText());
-        textField2.setVisible(false);
-        playerThree.setName(textField3.getText().isEmpty() ? "Igrač 3" : textField3.getText().length() > 8 ? textField3.getText().substring(0,8) : textField3.getText());
-        textField3.setVisible(false);
-        playerFour.setName(textField4.getText().isEmpty() ? "Igrač 4" : textField4.getText().length() > 8 ? textField4.getText().substring(0,8) : textField4.getText());
-        textField4.setVisible(false);
-        
-        btnR1.setVisible(false);
-        btnL1.setVisible(false);
-        btnR2.setVisible(false);
-        btnL2.setVisible(false);
-        btnR3.setVisible(false);
-        btnL3.setVisible(false);
-        btnR4.setVisible(false);
-        btnL4.setVisible(false);
-        btn2Players.setVisible(false);
-        btn3Players.setVisible(false);
-        btn4Players.setVisible(false);
-        btnStart.setVisible(false);
-  
-        initializePlayersOnStart();
-  
-        playerOne.getListOfPassedPoints().clear();
-        playerTwo.getListOfPassedPoints().clear();
-        playerThree.getListOfPassedPoints().clear();
-        playerFour.getListOfPassedPoints().clear();
-  
-        startCounter = true;  
-        drawSideBar();
-        image(colors, 0, 0, 5*width/6, height);
-        drawBackground(blackScreen);
-        fill(127, 0, 0);        
-        startTime = millis();
-        startInterval = secondsToStart;
-        text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);    
+        playersLeft = 4;  
     } else { 
         button.setFocus(true);
-        if (button == btnL1 || button == btnL2 || button == btnL3 || button == btnL4 || button == btnR1 || button == btnR2 || button == btnR3 || button == btnR4) {
+        if (button == btnLeft || button == btnRight) {
             button.setText("Pritisni tipku");
         } 
     }
+}
+
+void updateMouse() {
+  if(overRect(int(width*0.8 - textWidth("NEW GAME")/2), int(height*0.5), (int)textWidth("NEW GAME"), int(textAscent() - textDescent()))) {
+      drawMenu(1);
+  } else if(overRect(int(width*0.8 - textWidth("EXIT")/2), int(height*0.5 + (textAscent() - textDescent())*1.5), int(textWidth("EXIT")), int(textAscent() - textDescent()))){
+      drawMenu(2);
+  } else {
+      drawMenu(0);
+  }
+}
+
+boolean overRect(int x, int y, int wid, int hei) {
+  if (mouseX >= x && mouseX <= x+wid && 
+      mouseY <= y && mouseY >= y-hei) {
+    return true;
+  } else {
+    return false;
+  }
 }

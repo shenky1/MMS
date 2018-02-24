@@ -1,3 +1,5 @@
+private final int BOOSTER_SIZE = 16;
+
 /*
 * If players is alive and 
 * If collision occured plays sound, sets player new points and announces round winner if there is only one player left.
@@ -25,32 +27,31 @@ private void checkIfCollision(Player player) {
 * If a circle around his new position has reached a pixel that is not black or white this method will return false. 
 */
 private boolean hasCrashed(Player player) {
-    float directionStart = player.getDirection() - PI/4;
-    float directionEnd = directionStart + PI/2;
+    float directionStart = player.getDirection() - PI/3;
+    float directionEnd = directionStart + 2*PI/3;
     while(directionStart <= directionEnd) {
          int xToCheck = int(player.getX() + player.getSize() * cos(directionStart));
          int yToCheck = int(player.getY() + player.getSize() * -sin(directionStart));
          color col = get(xToCheck, yToCheck);
          if(col != color(255) && col != color(0)) {
-             if(hue(col) == hue(speed.getColor())) {
-                  removeBoosterAndDoTask(speed, player);
-             } else if(hue(col) == hue(size.getColor())) {
-                  removeBoosterAndDoTask(size, player);
-             } else if(hue(col) == hue(changeKeys.getColor())) {
-                  removeBoosterAndDoTask(changeKeys, player);
-             } else {
-                if(crashedIntoPlayer(col)) return true;
+             if(dist(xToCheck, yToCheck, speed.getX(), speed.getY()) < BOOSTER_SIZE) {
+                  doBoosterTask(speed, player);
+             } else if(dist(xToCheck, yToCheck, size.getX(), size.getY()) < BOOSTER_SIZE) {
+                  doBoosterTask(size, player);
+             } else if(dist(xToCheck, yToCheck, changeKeys.getX(), changeKeys.getY()) < BOOSTER_SIZE) {
+                  doBoosterTask(changeKeys, player);
+             } else if(crashedIntoPlayer(player, col)) {
+                  return true;
              }
-         } else if(grayPixel(col) || (col == color(0) && !blackScreen) || (col == color(255) && blackScreen))  {
-             int dx = 5*width/12 - xToCheck;
-             int dy = height/2 - yToCheck;
-             int x = int(xToCheck + 2*dx);
-             int y = int(yToCheck + 2*dy);
+         } else if(grayPixel(col) || col == color(0))  {
+             fillRemainingPixels(player);
+             int x = int(5*width/12 + (width/3 - player.getSize()) * cos(PI - player.getDirection()));
+             int y = int(height/2 + (3*height/7 - player.getSize()) * sin(PI - player.getDirection()));           
              player.setX(x);
              player.setY(y);
              return false;
          }
-         directionStart += PI/8;
+         directionStart += 2*PI/360;
     }
     return false;
 }
@@ -62,31 +63,59 @@ private boolean grayPixel (color p){
   return false;
 }
 
-private boolean crashedIntoPlayer(color col) {
+private void fillRemainingPixels(Player player) {  
+  int pixelsXLeft = player.getX() - player.getSize();
+  int pixelsXRight = player.getX() + player.getSize();
+  int pixelsYUp = player.getY() - player.getSize();
+  int pixelsYDown = player.getY() + player.getSize();
+       for(int i = pixelsXLeft; i <= pixelsXRight; ++i)
+            for(int j = pixelsYUp; j <= pixelsYDown; ++j) {
+                color col = get(i,j);
+                if(dist(i,j, player.getX(), player.getY()) < player.getSize() && !grayPixel(col) && col != color(0)) {
+                    set(i,j, player.getColor());
+                }
+            }
+};
+
+private boolean crashedIntoPlayer(Player player, color col) {
+  int pixelsXLeft = player.getX() - player.getSize();
+  int pixelsXRight = player.getX() + player.getSize();
+  int pixelsYUp = player.getY() - player.getSize();
+  int pixelsYDown = player.getY() + player.getSize();
+  for(Player p : listOfPlayers) {
+      if(col == p.getColor()) {
+         for(int i = pixelsXLeft; i <= pixelsXRight; ++i)
+            for(int j = pixelsYUp; j <= pixelsYDown; ++j) {
+                color col1 = get(i,j);
+                if(dist(i,j, player.getX(), player.getY()) < player.getSize() && col1 != p.getColor()) {
+                    set(i,j, player.getColor());
+                }
+            }
+          return true;
+      }
+  }
+  return false;
+}
+
+private boolean hasCrashedIntoPlayer(color col) {
   for(Player p : listOfPlayers) {
     if(col == p.getColor()) {
-      return true;
+        return true;
     }
   }
   return false;
 }
 
-private void removeBoosterAndDoTask(Booster booster, Player player) {
+private void doBoosterTask(Booster booster, Player player) {
      if(booster.getActive()) {
-         if(blackScreen) {
-             fill(0);
-             stroke(0);
-         } else {
-             fill(255);
-             stroke(255);
-         }
-         ellipse(booster.getX(), booster.getY(), 10, 10);
          try {
              booster.getTask().invoke(this, player);
          } catch(Exception e) {
            println(e.getMessage()); //<>//
          }
          booster.setActive(false);
+         currentTexture.mask(mask1);
+         image(currentTexture, booster.getX() - BOOSTER_SIZE, booster.getY() - BOOSTER_SIZE, 2*(BOOSTER_SIZE + 1), 2*(BOOSTER_SIZE + 1));      
      }
 }
 
@@ -101,14 +130,31 @@ private void announceRoundWinner(Player player) {
     
     int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
     player.setScore(player.getScore() + pointsWon);
-    float textHeight = textAscent() - textDescent();
+    
     drawSideBar();
+    
+    textSize(height/40);
+    float textHeight = textAscent() - textDescent();
     fill(player.getColor());
     text("Runda završena!", 6*width/7, height*0.6 + 2*textHeight);
     text("Pobjednik:", 6*width/7, height*0.6 + 4*textHeight); 
     text(player.getName(), 6*width/7, height*0.6 + 6*textHeight);
-    fill(255);
+    
+    placeStamp(player);
+    
     checkIfGameOver();
+}
+
+private void placeStamp(Player player) {
+    if(player == playerOne) {
+        image(redStamp, width * 0.03, height * 0.05, width/10, width/10);
+    } else if(player == playerTwo) {
+        image(blueStamp, width * 0.7, height * 0.05, width/10, width/10);
+    } else if(player == playerThree) {
+        image(greenStamp, width * 0.03, height * 0.75, width/10, width/10);
+    } else {
+        image(purpleStamp, width * 0.7, height * 0.75, width/10, width/10);
+    }
 }
 
 /*
@@ -153,11 +199,8 @@ private void announceFinalWinner(Player player) {
 }
 
 public void makeAllPlayersFasterExcept(Player player) {
-   for(Player p : listOfPlayers) {
-      if(p != player) {
-                 p.setSpeed(p.getSpeed() + 1);
-             }
-      }
+    for(Player p : listOfPlayers) 
+        if(p != player) p.setSpeed(p.getSpeed() + 1);
 }
 
 public void makeAllPlayersBiggerExcept(Player player) {

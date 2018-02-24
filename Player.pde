@@ -61,11 +61,13 @@ class Player {
     */
     private boolean keysChanged;
     
+    private boolean seen;
+
+
     /*
     * Constructor.
     */
-    public Player(String name, int x, int y, int direction, color col) {
-        this.name = name;
+    public Player(int x, int y, int direction, color col) {
         this.x = x; 
         this.y = y;
         this.direction = direction;
@@ -76,11 +78,12 @@ class Player {
         this.speed = 1;
     }
  
-    public Player(int left, int right, color col, Pair winTextPosition) { 
-        this("player", 0, 0, 1, color(0, 0, 0));
+    public Player(String name, int left, int right, color col) { 
+        this(0, 0, 1, color(0, 0, 0));
         this.left = left;
         this.right = right;
         this.col = col;
+        this.name = name;
     }
 
  
@@ -207,6 +210,14 @@ class Player {
     public void setKeysChanged(boolean keysChanged) {
        this.keysChanged = keysChanged;
        
+    }
+    
+    public boolean getSeen() {
+        return seen;
+    }
+    
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
     
     public void changeKeys() {

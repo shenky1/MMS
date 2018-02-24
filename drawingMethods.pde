@@ -1,35 +1,11 @@
-/*
-* Draws the playing area. Left of side bar.
-* Its called only when counter starts.
-* Draws an ellipse and fills outside of ellipse with players colors.
-*/
-private void drawPlayingArea() {
-    int heightHalf = height/2;
-    int widthHalf = 5*width/12;
-    float widthSqr = pow(widthHalf,2);
-    float heightSqr = pow(heightHalf, 2);
-    ellipse(widthHalf, heightHalf, widthHalf, heightHalf);
-    for(int i = 0; i < 5*width/6; ++i) {
-        for(int j = 0; j < height; ++j) {
-            if(pow(i - widthHalf, 2)/widthSqr + pow(j - heightHalf, 2)/heightSqr > 1) {
-                if(i > widthHalf && j > heightHalf) {
-                    set(i, j, playerFour.getColor());
-                } else if(i > widthHalf && j < heightHalf) {
-                    set(i, j, playerTwo.getColor());
-                } else if(i < widthHalf && j < heightHalf) {
-                    set(i, j, playerOne.getColor());
-                } else set (i, j, playerThree.getColor());
-            }
-        }
-    }
-}
-
+private final int STROKE_WEIGHT = 15;
 /*
 * Draws side bar which shows current players scores.
 * Also shows buttons that change background.
 */
 private void drawSideBar() {
-   
+    textFont(normalFont);
+    
     image(oilCanvas, 5*width/6, 0, width, height);
 
     fill(0);
@@ -37,46 +13,38 @@ private void drawSideBar() {
     rect(5*width/6, 0, 5*width/6 + 5, height);
 
     //information about exit
-    textSize((width + height)/60);
+    textSize(height/30);
     fill(127, 0, 0);
     text("Izlaz: esc", 6*width/7, height/15);
     
     text("Legenda:", 6*width/7, height/5);
-    textSize((width + height)/100);
+    textSize(height/40);
     float textHeight = textAscent() - textDescent();
     fill(speed.getColor());
-    drawStar(6*width/7, height/5 + 2*textHeight, 3, 8, 5);
-    text(" Ubrzaj igrače", 6*width/7 + 5, height/5 + 2*textHeight);
+    drawStar(6*width/7, height/5 + 3*textHeight, 3, 8, 5);
+    text(" Ubrzaj igrače", 6*width/7 + 10, height/5 + 3*textHeight + textHeight/2);
     fill(size.getColor());
-    drawStar(6*width/7, height/5 + 4*textHeight, 3, 8, 5);
-    text(" Podebljaj igrače", 6*width/7 + 5, height/5 + 4*textHeight);
+    drawStar(6*width/7, height/5 + 5*textHeight, 3, 8, 5);
+    text(" Podebljaj igrače", 6*width/7 + 10, height/5 + 5*textHeight + textHeight/2);
     fill(changeKeys.getColor());
-    drawStar(6*width/7, height/5 + 6*textHeight, 3, 8, 5);
-    text(" Promjeni smjer", 6*width/7 + 5, height/5 + 6*textHeight);
+    drawStar(6*width/7, height/5 + 7*textHeight, 3, 8, 5);
+    text(" Promjeni smjer", 6*width/7 + 10, height/5 + 7*textHeight + textHeight/2);
 
     
     
     fill(127, 0, 0);
     //Curent players scores
-    textSize((width + height)/60);
+    textSize(height/30);
     text("Rezultat:", 6*width/7, height*0.4);
-    textSize((width + height)/100);
-    drawPlayerScore(playerOne, 2*textHeight);
-    drawPlayerScore(playerTwo, 4*textHeight);
+    textSize(height/40);
+    drawPlayerScore(playerOne, 3*textHeight);
+    drawPlayerScore(playerTwo, 5*textHeight);
     if(numOfPlayers == 3 ||numOfPlayers == 4) {
-        drawPlayerScore(playerThree, 6*textHeight);
+        drawPlayerScore(playerThree, 7*textHeight);
     }
     if(numOfPlayers == 4) {
-        drawPlayerScore(playerFour, 8*textHeight);
+        drawPlayerScore(playerFour, 9*textHeight);
     }
-    
-    //buttons for black or white screen
-    stroke(0, 0, 0);
-    fill(255);
-    ellipse(width * 0.9  + width/30, height/9, width/60, width/60);
-    fill(0);
-    ellipse(width * 0.9, height/9, width/60, width/60);
-    
 }
 
 /*
@@ -115,39 +83,64 @@ private void drawWholePath(Player player) {
 /*
 * Draws black or white background over playing area based on users wish.
 */
-void drawBackground(boolean blackScreen) {
-    if(blackScreen) {
-        fill(0);
-        stroke(255);
-    } else {
-        fill(255);
-        stroke(0);
-    }
-    strokeWeight(15);
+void drawBackground() {
+    fill(0);
+    stroke(0);
+    strokeWeight(STROKE_WEIGHT);
     ellipse(5*width/12, height/2, width/3, 3*height/7);
     strokeWeight(1);
+    image(currentTexture, 0, 0, width, height);
+}
+
+private void chooseTextureRandomly() {
+    int texture = (int)random(1, 5.99);
+    if(texture == 1) {
+        currentTexture = snowTexture;
+    } else if(texture == 2) {
+        currentTexture = blackTexture;
+    } else if(texture == 3) {
+        currentTexture = brownTexture;
+    } else if(texture == 4) {
+        currentTexture = parquetTexture;
+    } else if (texture == 5) {
+         currentTexture = yellowTexture;
+    }
+}
+
+private void chooseBackgroundRandomly() {
+    int background = (int)random(1, 4.99);
+    if(background == 1) {
+        currentBackground = symmetricalBackground;
+    } else if(background == 2) {
+        currentBackground = xmasBackground;
+    } else if(background == 3) {
+        currentBackground = dirtyPaperBackground;
+    } else if(background == 4) {
+        currentBackground = redBackground;
+    } 
 }
 
 /*
 * Draws again button on side bar. Only called when round is over.
 */
 private void drawAgainButton() {
-    fill(0, 255, 0);
-    strokeWeight(3);
-    ellipse(11*width/12, height*0.85, width/20, width/20);
-    strokeWeight(1);
-    fill(127, 0, 0);
-    textSize((width + height)/70);
+    textSize(height/30);
+    betweenRounds = true;
     float textHeight = textAscent() - textDescent();
     float textWidth = textWidth("Nastavi!");
+    fill(0, 255, 0);
+    strokeWeight(3);
+    ellipse(11*width/12, height*0.85, textWidth*0.6, textWidth*0.6);
+    strokeWeight(1);
+    fill(127, 0, 0);
     text("Nastavi!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
 }
 
 
 private void initializeBooster(Booster booster, String methodName) {
     if(millis() - booster.getStartTime() > 1000 && booster.getStartInterval() > 0 && !booster.getActive()) {
-            booster.setStartTime(millis());
-            booster.setStartInterval(booster.getStartInterval() - 1);
+        booster.setStartTime(millis());
+        booster.setStartInterval(booster.getStartInterval() - 1);
     }
         
     if(booster.getStartInterval() == 0 && !booster.getActive()) {
@@ -172,137 +165,214 @@ private void initializeBooster(Booster booster, String methodName) {
 }
 
 private boolean available(int x, int y) {
-      for (int i = 0; i < width; i++) {
-          for (int j = 0; j < height; j++) {
-              if (dist(i, j, x, y) <= 100) {
-                  color c = get(i, j);
-                  if(!blackScreen && c != color(255)) return false;
-                  if(blackScreen && c != color(0)) return false;
-              }
-          }
-      }
-      return true;
+    for (int i = x - 10; i <= x + 10; i++) {
+        for (int j = y - 10; j < y + 10; j++) {
+            color c = get(i, j);
+            if(hasCrashedIntoPlayer(c) 
+            || c == size.getColor() || c == speed.getColor()
+            || c == changeKeys.getColor()) return false;
+        }
+    }
+    return true;
 }
 
 private void drawBooster(Booster booster) {
-      pushMatrix();
-      if(!blackScreen) {
-          fill(255);
-          stroke(255);
-      } else {
-          fill(0);
-          stroke(0);
-      }
-      ellipse(booster.getX(), booster.getY(), 10, 10);
-      translate(booster.getX(), booster.getY());
-      rotate(frameCount / -10.0);
-      fill(booster.getColor());
-      stroke(booster.getColor());
-      drawStar(0, 0, 3, 8, 5); 
-      popMatrix();
+    pushMatrix();
+    mask1.ellipse(booster.getX(), booster.getY(), BOOSTER_SIZE/2 + 2, BOOSTER_SIZE/2 + 2);
+    currentTexture.mask(mask1);
+    image(currentTexture, booster.getX() - BOOSTER_SIZE, booster.getY() - BOOSTER_SIZE, 2*(BOOSTER_SIZE + 2), 2*(BOOSTER_SIZE + 2));  
+    translate(booster.getX(), booster.getY());
+    rotate(frameCount / -10.0);
+    fill(booster.getColor());
+    stroke(booster.getColor());
+    drawStar(0, 0, 3, BOOSTER_SIZE/2, 5); 
+    popMatrix();
 }
 
-
-
-/*
-* Draws titles and players in their positions on start screen. Called after video ends.
-*/
-private void drawTitleAndPlayers() {
-    fill(0, 0, 255);   
-    textSize((height + width)/50);
-    textWidth = textWidth(title);
-    textHeight = textAscent() - textDescent();
-    text(title, (width - textWidth)/2, height/7 - textHeight);
-      
-    float buttonWidth = width/20;
-    float buttonHeight = textHeight;
-    
-    textSize((height + width)/70);
-    textWidth = textWidth(chooseColor);
-    textHeight = textAscent() - textDescent();
-    
-    fill(0, 0, 120);
-    textSize((height + width)/60); 
-    fill(playerOne.getColor());
-    text(player + "1", width/3 - textWidth - buttonWidth, height/7 + textAscent() - textDescent());  
-    fill(playerTwo.getColor());
-    text(player + "2", 2*width/3, height/7 + textAscent() - textDescent());    
-    fill(playerThree.getColor());
-    text(player + "3", width/3 - textWidth - buttonWidth, height/2 + textAscent() - textDescent());
-    fill(playerFour.getColor());
-    text(player + "4", 2*width/3, height/2 + textAscent() - textDescent());
-    
-    fill(0, 0, 120);
-    textSize((height + width)/70);
-    textWidth = textWidth(chooseColor);
-    textHeight = textAscent() - textDescent();
-    float textNameWidth = textWidth(name);
-    float textFieldWidth = textWidth + buttonWidth - textNameWidth;
-    text(name, width/3 - textWidth - buttonWidth, height/7 + 4*textHeight);
-    text(left, width/3 - textWidth - buttonWidth, height/7 + 6*textHeight);
-    text(right, width/3 - textWidth - buttonWidth, height/7 + 8*textHeight);  
-    text(name, 2*width/3, height/7 + 4*textHeight);
-    text(left, 2*width/3, height/7 + 6*textHeight);
-    text(right, 2*width/3, height/7 + 8*textHeight);
-    text(name, width/3 - textWidth - buttonWidth, height/2 + 4*textHeight);
-    text(left, width/3 - textWidth - buttonWidth, height/2 + 6*textHeight);
-    text(right, width/3 - textWidth - buttonWidth, height/2 + 8*textHeight);  
-    text(name, 2*width/3, height/2 + 4*textHeight);
-    
-    text(left, 2*width/3, height/2 + 6*textHeight);
-    text(right, 2*width/3, height/2 + 8*textHeight);  
-    
-    textField1 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
-    textField1.setPromptText(player + "1");
-    textField2 = new GTextField(this, 2*width/3 + textNameWidth, height/7 + 3*textHeight, textFieldWidth, textHeight);
-    textField2.setPromptText(player + "2");
-    textField3 = new GTextField(this, width/3 - textWidth - buttonWidth + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
-    textField3.setPromptText(player + "3");
-    textField4 = new GTextField(this, 2*width/3 + textNameWidth, height/2 + 3*textHeight, textFieldWidth, textHeight);
-    textField4.setPromptText(player + "4");
-    
-    //button for players to choose keys
-    btnL1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "LIJEVO");
-    btnR1 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "DESNO");
-    btnL2 = new GButton(this, 2*width/3 + textWidth, height/7 + 5*textHeight, buttonWidth, buttonHeight, "A");
-    btnR2 = new GButton(this, 2*width/3 + textWidth, height/7 + 7*textHeight, buttonWidth, buttonHeight, "D"); 
-    btnL3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "B");
-    btnR3 = new GButton(this, width/3 - textWidth - buttonWidth + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "M"); 
-    btnL4 = new GButton(this, 2*width/3 + textWidth, height/2 + 5*textHeight, buttonWidth, buttonHeight, "4");
-    btnR4 = new GButton(this, 2*width/3 + textWidth, height/2 + 7*textHeight, buttonWidth, buttonHeight, "6"); 
-    
+private void drawStartScreen() {
+    image(frontPageBackground, 0, 0, width, height);
+    textFont(titleFont);  
+    fill(0);
+    text("Beware!", width/20, height*0.45);
+    text("the CURVE", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
+   
+    textFont(menuFont);
+    text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+    text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.5 + (textAscent() - textDescent())*1.5);
+   
 }
 
-/*
-* Draws start button and buttons to choose 2,3 or 4 players. Called after video ends.
-*/
-private void drawStartAndChoosePlayers() {
-    float buttonRadius = width/10;
-    btnStart = new GButton(this, (width - buttonRadius)/2, 5*height/14 - buttonRadius/2, buttonRadius, buttonRadius, "START");
-    btnStart.setLocalColor(4, color(0, 255, 0));   
+private void checkIfMouseAboveMenu() {
+    if(width*0.8 - textWidth("NEW GAME")/2 <= mouseX && mouseX <= width*0.8 + textWidth("NEW GAME")/2 && height*0.5 >= mouseY && height*0.5 - textAscent() + textDescent() <= mouseY) {
+        frontScreen = false;
+        textFont(menuFontBold);
+        textSize(height/10);
+        float textHeight = textAscent() - textDescent();
+        nameField = new GTextField(this, width*0.4 + textWidth("Name: "), (height - textHeight)/2, width/10, textHeight/2);
+        nameField.setVisible(false);
+        btnLeft = new GButton(this, width*0.4 + textWidth("Right: "), height/2 + textHeight, width/20, textHeight);
+        btnRight = new GButton(this, width*0.4 + textWidth("Right: "), height/2 + 3*textHeight, width/20, textHeight);
+        btnLeft.setVisible(false);
+        btnRight.setVisible(false);
+        drawNewGameScreen();
+        newGame = true;
+    } else if(width*0.8 - textWidth("EXIT")/2 <= mouseX && mouseX <= width*0.8 + textWidth("EXIT")/2 && height*0.5 + (textAscent() - textDescent())*1.5 >= mouseY && height*0.5 + (textAscent() - textDescent())/2 <= mouseY) {
+         exit();
+    }
+}
+
+private void drawMenu(int pos) {
+    image(frontPageBackground, 0, 0, width, height);
+    textFont(titleFont);  
+    fill(0);
+    text("Beware!", width/20, height*0.45);
+    text("the CURVE", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
+    if(pos == 0) {
+        textFont(menuFont);
+        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+    } else if(pos == 1) {
+        textFont(menuFontBold);
+        fill(127, 0, 0);
+        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+        textFont(menuFont);
+        fill(0);
+        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+    } else if(pos == 2) {
+        textFont(menuFont);
+        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+        fill(127, 0, 0);
+        textFont(menuFontBold);
+        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        fill(0);
+    }
+}
+
+private void drawNewGameScreen() { 
+    image(newGameBackground, 0, 0, width, height);
+    PShape left = createShape();
+    PShape right = createShape();
+    left.beginShape();
+    left.fill(255, 255, 0);
+    left.stroke(5);
+    left.vertex(width/25, height/2);
+    left.vertex(width/12, height*0.55);
+    left.vertex(width/12, height*0.45);
+    left.endShape(CLOSE);
+    shape(left);
+    right.beginShape();
+    right.fill(255, 220, 0);
+    right.stroke(5);
+    right.vertex(24*width/25, height/2);
+    right.vertex(11*width/12, height*0.55);
+    right.vertex(11*width/12, height*0.45);
+    right.endShape(CLOSE);
+    shape(right);
     
-    textSize((height + width)/70);
-    textWidth = textWidth(rule1);
-    textHeight = textAscent() - textDescent();
-    text(rule1, (width - textWidth)/2, 6*height/7 + textHeight);
-    textWidth = textWidth(rule2);
-    text(rule2, (width - textWidth)/2, 6*height/7 + 3*textHeight);
+    textFont(menuFontBold);
+    fill(200, 0, 0);
+    textSize(height/10);
+    float textWidth = textWidth("Choose number of players");
+    text("Choose number of players", (width - textWidth)/2, height/4);
     
-    
-    fill(255, 0, 0);
-    textWidth = textWidth(chooseNumOfPlayers);
-    text(chooseNumOfPlayers, (width - textWidth)/2, 4*height/7 + textHeight);
-    buttonRadius = (textWidth - (height + width)/60)/3;
-    
-    btn2Players = new GButton(this, (width - textWidth)/2 , 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "2"); 
-    btn3Players = new GButton(this, (width - textWidth)/2 + (height + width)/120 + buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "3");
-    btn4Players = new GButton(this, (width -textWidth)/2 + (height + width)/60 + 2*buttonRadius, 5*height/7 - buttonRadius/2, buttonRadius, buttonRadius, "4");
+    int buttonRadius = width/10;
+    btn2Players = new GButton(this, width/2 - 2*buttonRadius, height/2, buttonRadius, buttonRadius, "2"); 
+    btn3Players = new GButton(this, (width - buttonRadius)/2, height/2, buttonRadius, buttonRadius, "3");
+    btn4Players = new GButton(this, width/2 + buttonRadius, height/2, buttonRadius, buttonRadius, "4");
     btn2Players.setLocalColor(4, color(255, 0, 0));
     btn3Players.setLocalColor(4, color(255, 0, 0));
     btn4Players.setLocalColor(4, color(255, 0, 0));
     btn2Players.setLocalColor(3, color(0, 0, 255));
     btn3Players.setLocalColor(3, color(0, 0, 255));
     btn4Players.setLocalColor(3, color(0, 0, 255));
+}
+
+private void drawScreenPlayer(int i) {
+    image(newGameBackground, 0, 0, width, height);
+    PShape left = createShape();
+    PShape right = createShape();
+    left.beginShape();
+    left.fill(255, 255, 0);
+    left.stroke(5);
+    left.vertex(width/25, height/2);
+    left.vertex(width/12, height*0.55);
+    left.vertex(width/12, height*0.45);
+    left.endShape(CLOSE);
+    shape(left);
+    textFont(menuFontBold);
+    textSize(height/10);
+        
+    if(i != numOfPlayers) {
+        right.beginShape();
+        right.fill(255, 220, 0);
+        right.stroke(5);
+        right.vertex(24*width/25, height/2);
+        right.vertex(11*width/12, height*0.55);
+        right.vertex(11*width/12, height*0.45);
+        right.endShape(CLOSE);
+        shape(right);
+    } else {
+        right.beginShape();
+        right.fill(255, 255, 1);
+        right.stroke(5);
+        right.vertex(24*width/25, height*0.53);
+        right.vertex(24*width/25, height*0.46);
+        right.vertex(0.9*width, height*0.42);
+        right.vertex(5*width/6, height*0.46);
+        right.vertex(5*width/6, height*0.53);
+        right.vertex(0.9*width, height*0.57);
+        right.endShape(CLOSE);
+        shape(right);
+        fill(200, 0, 1);
+        text("GO!", 0.9*width - textWidth("GO!")/2, height/2 + (textAscent() - textDescent())/2); 
+
+    }
+        fill(200, 0, 0);
+        text("Player " + i + ":", (width - textWidth("Player 1:"))/2, height*0.3);
+        text("Name: ", width*0.4, height/2);
+        text("Left: ", width* 0.4, height/2 + 2*(textAscent() - textDescent()));
+        text("Right: ", width* 0.4, height/2 + 4*(textAscent() - textDescent()));
+        
+        if(i == 1) {
+            nameField.setText(playerOne.getName());
+            btnLeft.setText(asciiToKey(playerOne.getLeft()) + "");
+            btnRight.setText(asciiToKey(playerOne.getRight()) + "");
+        } else if(i == 2) {
+            nameField.setText(playerTwo.getName());
+            btnLeft.setText(asciiToKey(playerTwo.getLeft()) + "");
+            btnRight.setText(asciiToKey(playerTwo.getRight()) + ""); 
+        } else if(i == 3) {
+            nameField.setText(playerThree.getName());
+            btnLeft.setText(asciiToKey(playerThree.getLeft()) + "");
+            btnRight.setText(asciiToKey(playerThree.getRight()) + "");
+        } else if(i == 4) {
+            nameField.setText(playerFour.getName());
+            btnLeft.setText(asciiToKey(playerFour.getLeft()) + "");
+            btnRight.setText(asciiToKey(playerFour.getRight()) + "");
+        }
+}
+
+private void startGame() {
+    startSound.close();
+    frontScreen = false;
+
+    initializePlayersOnStart();
+
+    playerOne.getListOfPassedPoints().clear();
+    playerTwo.getListOfPassedPoints().clear();
+    playerThree.getListOfPassedPoints().clear();
+    playerFour.getListOfPassedPoints().clear();
+
+    startCounter = true;  
+    drawSideBar();
+    chooseBackgroundRandomly();
+    image(currentBackground, 0, 0, 5*width/6, height);
+    chooseTextureRandomly();
+    drawBackground();
+    fill(127, 0, 0);        
+    startTime = millis();
+    startInterval = secondsToStart;
+    text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);  
 }
 
 /*
@@ -312,6 +382,8 @@ void drawStar(float x, float y, float radius1, float radius2, int npoints) {
   float angle = TWO_PI / npoints;
   float halfAngle = angle/2.0;
   beginShape();
+  strokeWeight(3);
+  stroke(0);
   for (float a = 0; a < TWO_PI; a += angle) {
     float sx = x + cos(a) * radius2;
     float sy = y + sin(a) * radius2;
@@ -319,6 +391,7 @@ void drawStar(float x, float y, float radius1, float radius2, int npoints) {
     sx = x + cos(a+halfAngle) * radius1;
     sy = y + sin(a+halfAngle) * radius1;
     vertex(sx, sy);
+  strokeWeight(1);
   }
   endShape(CLOSE);
 }

@@ -11,7 +11,7 @@ private void setPlayerKeys(Player player, GButton button, Turn direction) {
     String keyStr = wishedKey + "";
     
     if (button.hasFocus()) {
-        if(key == CODED) {
+        if(key == CODED) { //<>//
             switch(keyCode) {
                 case LEFT:    button.setText("LEFT");
                               break;
@@ -69,6 +69,24 @@ private boolean isAvailable(char wishedKey) {
         }
     }
     return true;
+}
+
+private String asciiToKey(int playerKey) {
+     switch(playerKey) {
+                case LEFT:      return "LEFT";
+                case RIGHT:     return "RIGHT";                             
+                case UP:        return "UP";                              
+                case DOWN:      return "DOWN";                              
+                case ALT:       return "ALT";                          
+                case CONTROL:   return "CTRL";                           
+                case SHIFT:     return "SHIFT";   
+                case BACKSPACE: return "BACKSPACE";
+                case TAB:       return "TAB";
+                case ENTER:     return "ENTER";
+                case RETURN:    return "RETURN";
+                case DELETE:    return "DELETE";
+     }
+     return (char)playerKey + "";
 }
 
 /*

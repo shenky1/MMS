@@ -8,31 +8,23 @@ Minim minim;//audio context
 
 Movie loadingVideo;
 int startVideo;
+boolean playVideo;
 
 PImage redBackground, xmasBackground, dirtyPaperBackground, symmetricalBackground, currentBackground, oilCanvas, blueStamp, redStamp, greenStamp,
        purpleStamp, snowTexture, blackTexture, parquetTexture, brownTexture, yellowTexture, currentTexture, frontPageBackground, newGameBackground;
-PGraphics mask1, mask2;
+PGraphics mask1;
 
 PFont titleFont, menuFont, menuFontBold, normalFont;
 
-boolean startRound = false; // start button
-boolean startCounter = false;  // used for countdown
-boolean frontScreen = true; // am I on front page
-boolean newGame = false;
-boolean endOfGame = false; // Any player reached numOfPointsToWin;
-boolean fillPlayerScreen = false;
-boolean betweenRounds;
-
-boolean playVideo;
+boolean startRound, startCounter, newGame, endOfGame, betweenRounds; // Any player reached numOfPointsToWin;
 boolean player1Screen, player2Screen, player3Screen, player4Screen;
-
-float textWidth;
-float textHeight;
+boolean frontScreen = true; // am I on front page 
+boolean menuDrawn = true;
 
 int numOfPlayers; // starting number of players
 int playersLeft; // how many players are alive at any time during the game
 
-int numOfPointsForWin = 30; //final number of points to win
+int numOfPointsForWin = 10; //final number of points to win
 
 Player playerOne, playerTwo, playerThree, playerFour;
 
@@ -44,31 +36,20 @@ float startTime; // time calculated with millis() when button is pressed.. Used 
 
 Booster speed, size, changeKeys;
 
-//colors for gradient.. Copied from internet
-color b1 = color(255);
-color b2 = color(0);
-color c1 = color(204, 102, 0);
-color c2 = color(0, 102, 153);
-
-//choosing names
 GTextField nameField;
-
 GButton btnLeft, btnRight;
 GButton btn2Players, btn3Players, btn4Players;
-
-Class[] parameterTypes;
 
 void setup() {
    // size(900,600);
     fullScreen();
     frameRate(20);
     
+    //set modes for drawing
     rectMode(CORNERS);
     ellipseMode(RADIUS);
     
-    parameterTypes = new Class[1];
-    parameterTypes[0] = MMS.Player.class;
-    
+    //initialize all backgrounds, textures, stamps,
     frontPageBackground = loadImage(dataPath("Pictures/frontPageBackground.png"));
     newGameBackground = loadImage(dataPath("Pictures/newGameBackground.jpg"));
     redBackground = loadImage(dataPath("Pictures/redBackground.jpg"));
@@ -84,15 +65,16 @@ void setup() {
     blackTexture = loadImage(dataPath("Pictures/blackTexture.jpg"));
     parquetTexture = loadImage(dataPath("Pictures/parquetTexture.jpg"));
     yellowTexture = loadImage(dataPath("Pictures/yellowTexture.jpg"));
-    brownTexture = loadImage(dataPath("Pictures/brownTexture.jpg"));
+    brownTexture = loadImage(dataPath("Pictures/brownTexture.jpg"));   
     
-    
+    //resize for masking (we want ellipse shape)
     snowTexture.resize(width, height);
     blackTexture.resize(width, height);
     brownTexture.resize(width, height);
     parquetTexture.resize(width, height);
     yellowTexture.resize(width, height);
     
+    //masking texture image with wanted shape
     mask1 = createGraphics(snowTexture.width, snowTexture.height, JAVA2D);
     mask1.beginDraw();
     mask1.background(0);
@@ -107,26 +89,30 @@ void setup() {
     parquetTexture.mask(mask1);
     yellowTexture.mask(mask1);
 
+    //initialize video
     loadingVideo = new Movie(this, dataPath("Videos/loadingVideo.mp4"));
     
-    textSize(width/60);
-    playerOne = new Player("Player 1", 37, 39, color(255, 0, 0)); // <-, ->
-    playerTwo = new Player("Player 2", 65, 68, color(0, 0, 255)); // A, D
-    playerThree = new Player("Player 3", 66, 77, color(0, 100, 0)); // B,M
-    playerFour = new Player("Player 4", 52, 54, color(165, 20, 140)); // 4, 6
+    //initialize players
+    playerOne = new Player("Igrac 1", 37, 39, color(255, 0, 0)); // <-, ->
+    playerTwo = new Player("Igrac 2", 65, 68, color(0, 0, 255)); // A, D
+    playerThree = new Player("Igrac 3", 66, 77, color(0, 100, 0)); // B,M
+    playerFour = new Player("Igrac 4", 52, 54, color(165, 20, 140)); // 4, 6
 
+    //adding players to list (will be easier to loop over players)
     listOfPlayers = new ArrayList<Player>();
     listOfPlayers.add(playerOne);
     listOfPlayers.add(playerTwo);
     listOfPlayers.add(playerThree);
     listOfPlayers.add(playerFour);
     
+    //initialize all sounds
     minim = new Minim(this);
     crashSound = minim.loadFile(dataPath("Sounds/crash.mp3"));
     cheerSound = minim.loadFile(dataPath("Sounds/cheer.mp3"));
     startSound = minim.loadFile(dataPath("Sounds/startMusic.mp3"));
     endCheerSound = minim.loadFile(dataPath("Sounds/endCheer.mp3"));    
  
+    //initialize boosters
     size = new Booster(0, 0, color(255, 255, 0));
     speed = new Booster(0, 0, color(0, 255, 255));
     changeKeys = new Booster(0, 0, color(255, 0, 255));
@@ -135,38 +121,31 @@ void setup() {
     numOfPlayers = 2;
     playersLeft = 2;
    
+    //inizialize fonts
     titleFont = createFont(dataPath("Fonts/titleCurved2.otf"), height/10);
     menuFont = createFont(dataPath("Fonts/menu.ttf"), height/13);
     menuFontBold = createFont(dataPath("Fonts/menuBold.ttf"), height/13);
     normalFont = createFont(dataPath("Fonts/CaviarDreams_Bold.ttf"), 60);
 
     drawStartScreen();    
-
-    //looping but not well.. Not continuous
     startSound.loop();
-
-
 }
-
-void movieEvent(Movie m) {
-     m.read();
-}
-
 
 void draw() {
-  
+    
      if(playVideo) {
          image(loadingVideo, 0, 0, width, height);
+         if(millis() - startVideo > 1000 * loadingVideo.duration()) {
+             playVideo = false;
+             startGame();
+         }
      }
-     
-     if(millis() - startVideo > 1000 * loadingVideo.duration() && playVideo) {
-         playVideo = false;
-         startGame();
-     }
-  
+    
+    //used for bolding menu if mouse is over it
     if(frontScreen) {
         updateMouse();
     }
+      
       
     if(startCounter) {    
         startCountdown();
@@ -191,17 +170,19 @@ void draw() {
               println(e.getMessage());      
           }
           
-          if(speed.getActive()) {
-            drawBooster(speed); //<>//
+          if(!endOfGame) {
+              if(speed.getActive()) {
+                drawBooster(speed); //<>//
+              }
+              
+              if(size.getActive()) {
+                drawBooster(size);
+              }
+              
+              if(changeKeys.getActive()) {
+                drawBooster(changeKeys);
+              }
           }
-          
-          if(size.getActive()) {
-            drawBooster(size);
-          }
-          
-          if(changeKeys.getActive()) {
-            drawBooster(changeKeys);
-        }
     }
 }
 
@@ -212,7 +193,7 @@ void draw() {
 */
 private void startCountdown() {
     if(millis() - startTime > 1000 && startInterval >= 0) {
-        drawBackground();
+        drawTexture();
         for(Player p : listOfPlayers) {
             fill(p.getColor());
             stroke(p.getColor());
@@ -230,7 +211,7 @@ private void startCountdown() {
     
     if(startInterval == 0) {
         startCounter = false;
-        drawBackground();
+        drawTexture();
         startRound = true;
         size.setStartInterval(3);
         speed.setStartInterval(3);
@@ -272,27 +253,24 @@ void mousePressed() {
         image(currentBackground, 0, 0, 5*width/6, height);
         drawSideBar();
         chooseTextureRandomly();
-        drawBackground();
+        drawTexture();
         startInterval = secondsToStart;
         fill(127, 0, 0);
-        text(str(startInterval), 5*width/12, (height - textWidth("0"))/2);    
+        text(str(startInterval), 5*width/12, (height - textWidth("3"))/2);    
         startTime = millis();
-        playerOne.getListOfPassedPoints().clear();
-        playerTwo.getListOfPassedPoints().clear();
-        playerThree.getListOfPassedPoints().clear();
-        playerFour.getListOfPassedPoints().clear();
         speed.setActive(false);
         size.setActive(false);
         changeKeys.setActive(false);
         for(Player p : listOfPlayers) {
             p.setSpeed(1);
-            p.setSize(5);
+            p.setSize(4);
             if(p.isKeysChanged()) {
                 p.changeKeys();   
             }
         }
-    } else if(frontScreen) checkIfMouseAboveMenu(); 
-    else if(newGame && get(mouseX, mouseY) == color(255,255,0)) {
+    } else if(frontScreen) {
+        checkIfMouseAboveMenu(); 
+    } else if(newGame && get(mouseX, mouseY) == color(255,255,0)) {
       frontScreen = true;
       newGame = false;
       drawStartScreen();
@@ -312,60 +290,51 @@ void mousePressed() {
     } else if(player1Screen && get(mouseX, mouseY) == color(255,255,0)) {
           newGame = true;
           player1Screen = false;
-          playerOne.setName(nameField.getText().isEmpty() ? "Player 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+          playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
           nameField.setVisible(false);
           btnLeft.setVisible(false);
           btnRight.setVisible(false);
-          drawNewGameScreen();
+          drawChoosePlayersScreen();
     } else if(player1Screen && get(mouseX, mouseY) == color(255,220,0)) {
          player2Screen = true;
          player1Screen = false;
-         playerOne.setName(nameField.getText().isEmpty() ? "Player 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(2);
     } else if(player2Screen && get(mouseX, mouseY) == color(255,255,0)) {
          player2Screen = false;
          player1Screen = true;
-         playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(1);
     } else if(player2Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
          player3Screen = true;
          player2Screen = false;
-         playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(3);
     } else if(player3Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
          player3Screen = false;
          player2Screen = true;
-         playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(2);
     } else if(player3Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
          player4Screen = true;
          player3Screen = false;
-         playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(4);
     } else if(player4Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
          player3Screen = true;
          player4Screen = false;
-         playerFour.setName(nameField.getText().isEmpty() ? "Player 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
          drawScreenPlayer(3);
     } else if(!startRound && get(mouseX, mouseY) == color(255, 255, 1) ||  get(mouseX, mouseY) == color(200, 0, 1)) {
       if(player2Screen) {
-        playerTwo.setName(nameField.getText().isEmpty() ? "Player 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
-        startSound.close();
-        loadingVideo.play();
-        startVideo = millis();
-        playVideo = true;
+        playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playVideo();
       } else if(player3Screen) {
-        playerThree.setName(nameField.getText().isEmpty() ? "Player 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
-        startSound.close();
-        loadingVideo.play();
-        startVideo = millis();
-        playVideo = true;     
+        playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playVideo(); 
       } else if(player4Screen) {
-        playerFour.setName(nameField.getText().isEmpty() ? "Player 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
-        loadingVideo.play();
-        startSound.close();
-        startVideo = millis();
-        playVideo = true;  
+        playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playVideo();
       }
         nameField.setVisible(false);
         btnLeft.setVisible(false);
@@ -373,10 +342,17 @@ void mousePressed() {
     }
 }
 
+private void playVideo() {
+      loadingVideo.play();
+      startSound.close();
+      startVideo = millis();
+      playVideo = true; 
+}
+
 /*
 * Checks if mouse if over button used in mousePressed().
 */
-boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)  {
+private boolean overButton(float buttonCenterX, float buttonCenterY, float buttonRadius)  {
     if(dist(mouseX, mouseY, buttonCenterX, buttonCenterY) <= buttonRadius) return true;
     else return false;
 }
@@ -460,17 +436,21 @@ void handleButtonEvents(GButton button , GEvent event) {
     }
 }
 
-void updateMouse() {
-  if(overRect(int(width*0.8 - textWidth("NEW GAME")/2), int(height*0.5), (int)textWidth("NEW GAME"), int(textAscent() - textDescent()))) {
+void movieEvent(Movie m) {
+     m.read();
+}
+
+private void updateMouse() {
+  if(overRect(int(width*0.8 - textWidth("NOVA IGRA")/2), int(height*0.5), (int)textWidth("NOVA IGRA"), int(textAscent() - textDescent()))) {
       drawMenu(1);
-  } else if(overRect(int(width*0.8 - textWidth("EXIT")/2), int(height*0.5 + (textAscent() - textDescent())*1.5), int(textWidth("EXIT")), int(textAscent() - textDescent()))){
+  } else if(overRect(int(width*0.8 - textWidth("IZLAZ")/2), int(height*0.5 + (textAscent() - textDescent())*1.5), int(textWidth("IZLAZ")), int(textAscent() - textDescent()))){
       drawMenu(2);
-  } else {
+  } else if(!menuDrawn) {
       drawMenu(0);
   }
 }
 
-boolean overRect(int x, int y, int wid, int hei) {
+private boolean overRect(int x, int y, int wid, int hei) {
   if (mouseX >= x && mouseX <= x+wid && 
       mouseY <= y && mouseY >= y-hei) {
     return true;

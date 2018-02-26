@@ -25,10 +25,6 @@ class Player {
     */
     private boolean alive;
     /*
-    *  List of points player has passed.
-    */
-    private ArrayList<Pair> listOfPassedPoints;
-    /*
     *  Ascii value of player's left key.
     */
     private int left;
@@ -73,7 +69,6 @@ class Player {
         this.direction = direction;
         this.col = col;
         
-        this.listOfPassedPoints = new ArrayList<Pair>();
         this.size = 4;
         this.speed = 1;
     }
@@ -141,18 +136,6 @@ class Player {
     
     public void setAlive(boolean alive) {
         this.alive = alive;
-    }
-    
-    public ArrayList<Pair> getListOfPassedPoints() {
-        return listOfPassedPoints;
-    }
-    
-    public void setListOfPassedPoints(ArrayList<Pair> listOfPassedPoints) {
-        this.listOfPassedPoints = listOfPassedPoints;
-    }
-    
-    public void updateListOfPassedPoints(Pair p) {
-        listOfPassedPoints.add(p);
     }
    
     public int getSize() {

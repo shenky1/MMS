@@ -189,7 +189,7 @@ private void checkIfGameOver() {
 private void announceFinalWinner(Player player) {
     fill(player.getColor());
     
-    ellipse(5*width/12, height/2, 5*width/12, height/2);
+    ellipse(5*width/12, height/2, width/3, 3*height/7);
     float textWidth = textWidth(player.getName() + "je pobjednik!");
     fill(0);
     text(player.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);

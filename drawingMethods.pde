@@ -64,26 +64,13 @@ private void drawPlayersCurrentPosition(Player player) {
         fill(player.getColor());
         stroke(player.getColor());   
         ellipse(player.getX(), player.getY(), player.getSize(), player.getSize());
-        player.updateListOfPassedPoints(new Pair(player.getX(), player.getY()));
-    }
-}
-
-/*
-* Draw whole path of a player. Called if on round end user has pressed button to change background.
-*/
-private void drawWholePath(Player player) {
-    ArrayList<Pair> passedPoints = player.getListOfPassedPoints();
-    fill(player.getColor());
-    stroke(player.getColor());
-    for(Pair p : passedPoints) {
-        ellipse(p.getX(), p.getY(), player.getSize(), player.getSize());
     }
 }
 
 /*
 * Draws black or white background over playing area based on users wish.
 */
-void drawBackground() {
+void drawTexture() {
     fill(0);
     stroke(0);
     strokeWeight(STROKE_WEIGHT);
@@ -193,30 +180,30 @@ private void drawStartScreen() {
     image(frontPageBackground, 0, 0, width, height);
     textFont(titleFont);  
     fill(0);
-    text("Beware!", width/20, height*0.45);
-    text("the CURVE", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
+    text("Pazi!", width/20, height*0.45);
+    text("KRIVULJA", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
    
     textFont(menuFont);
-    text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
-    text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.5 + (textAscent() - textDescent())*1.5);
+    text("NOVA IGRA", width*0.8 - textWidth("NOVA IGRA")/2, height*0.5);
+    text("IZLAZ", width*0.8 - textWidth("IZLAZ")/2, height*0.5 + (textAscent() - textDescent())*1.5);
    
 }
 
 private void checkIfMouseAboveMenu() {
-    if(width*0.8 - textWidth("NEW GAME")/2 <= mouseX && mouseX <= width*0.8 + textWidth("NEW GAME")/2 && height*0.5 >= mouseY && height*0.5 - textAscent() + textDescent() <= mouseY) {
+    if(width*0.8 - textWidth("NOVA IGRA")/2 <= mouseX && mouseX <= width*0.8 + textWidth("NOVA IGRA")/2 && height*0.5 >= mouseY && height*0.5 - textAscent() + textDescent() <= mouseY) {
         frontScreen = false;
         textFont(menuFontBold);
         textSize(height/10);
         float textHeight = textAscent() - textDescent();
-        nameField = new GTextField(this, width*0.4 + textWidth("Name: "), (height - textHeight)/2, width/10, textHeight/2);
+        nameField = new GTextField(this, width*0.4 + textWidth("Ime: "), (height - textHeight)/2, width/10, textHeight/2);
         nameField.setVisible(false);
-        btnLeft = new GButton(this, width*0.4 + textWidth("Right: "), height/2 + textHeight, width/20, textHeight);
-        btnRight = new GButton(this, width*0.4 + textWidth("Right: "), height/2 + 3*textHeight, width/20, textHeight);
+        btnLeft = new GButton(this, width*0.4 + textWidth("Lijevo: "), height/2 + textHeight, width/20, textHeight);
+        btnRight = new GButton(this, width*0.4 + textWidth("Lijevo: "), height/2 + 3*textHeight, width/20, textHeight);
         btnLeft.setVisible(false);
         btnRight.setVisible(false);
-        drawNewGameScreen();
+        drawChoosePlayersScreen();
         newGame = true;
-    } else if(width*0.8 - textWidth("EXIT")/2 <= mouseX && mouseX <= width*0.8 + textWidth("EXIT")/2 && height*0.5 + (textAscent() - textDescent())*1.5 >= mouseY && height*0.5 + (textAscent() - textDescent())/2 <= mouseY) {
+    } else if(width*0.8 - textWidth("IZLAZ")/2 <= mouseX && mouseX <= width*0.8 + textWidth("IZLAZ")/2 && height*0.5 + (textAscent() - textDescent())*1.5 >= mouseY && height*0.5 + (textAscent() - textDescent())/2 <= mouseY) {
          exit();
     }
 }
@@ -225,30 +212,33 @@ private void drawMenu(int pos) {
     image(frontPageBackground, 0, 0, width, height);
     textFont(titleFont);  
     fill(0);
-    text("Beware!", width/20, height*0.45);
-    text("the CURVE", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
+    text("Pazi!", width/20, height*0.45);
+    text("KRIVULJA", width/9, height*0.45 + (textAscent() - textDescent())*1.5);
     if(pos == 0) {
         textFont(menuFont);
-        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
-        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        text("NOVA IGRA", width*0.8 - textWidth("NOVA IGRA")/2, height*0.5);
+        text("IZLAZ", width*0.8 - textWidth("IZLAZ")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        menuDrawn = true;
     } else if(pos == 1) {
         textFont(menuFontBold);
         fill(127, 0, 0);
-        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+        text("NOVA IGRA", width*0.8 - textWidth("NOVA IGRA")/2, height*0.5);
         textFont(menuFont);
         fill(0);
-        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        text("IZLAZ", width*0.8 - textWidth("IZLAZ")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        menuDrawn = false;
     } else if(pos == 2) {
         textFont(menuFont);
-        text("NEW GAME", width*0.8 - textWidth("NEW GAME")/2, height*0.5);
+        text("NOVA IGRA", width*0.8 - textWidth("NOVA IGRA")/2, height*0.5);
         fill(127, 0, 0);
         textFont(menuFontBold);
-        text("EXIT", width*0.8 - textWidth("EXIT")/2, height*0.50 + (textAscent() - textDescent())*1.5);
+        text("IZLAZ", width*0.8 - textWidth("IZLAZ")/2, height*0.50 + (textAscent() - textDescent())*1.5);
         fill(0);
+        menuDrawn = false;
     }
 }
 
-private void drawNewGameScreen() { 
+private void drawChoosePlayersScreen() { 
     image(newGameBackground, 0, 0, width, height);
     PShape left = createShape();
     PShape right = createShape();
@@ -272,8 +262,8 @@ private void drawNewGameScreen() {
     textFont(menuFontBold);
     fill(200, 0, 0);
     textSize(height/10);
-    float textWidth = textWidth("Choose number of players");
-    text("Choose number of players", (width - textWidth)/2, height/4);
+    float textWidth = textWidth("Odaberite broj igraca");
+    text("Odaberite broj igraca", (width - textWidth)/2, height/4);
     
     int buttonRadius = width/10;
     btn2Players = new GButton(this, width/2 - 2*buttonRadius, height/2, buttonRadius, buttonRadius, "2"); 
@@ -324,14 +314,16 @@ private void drawScreenPlayer(int i) {
         right.endShape(CLOSE);
         shape(right);
         fill(200, 0, 1);
-        text("GO!", 0.9*width - textWidth("GO!")/2, height/2 + (textAscent() - textDescent())/2); 
+        textSize(height/15);
+        text("IGRAJ!", 0.9*width - textWidth("IGRAJ!")/2, height/2 + (textAscent() - textDescent())/2); 
 
     }
+        textSize(height/10);
         fill(200, 0, 0);
-        text("Player " + i + ":", (width - textWidth("Player 1:"))/2, height*0.3);
-        text("Name: ", width*0.4, height/2);
-        text("Left: ", width* 0.4, height/2 + 2*(textAscent() - textDescent()));
-        text("Right: ", width* 0.4, height/2 + 4*(textAscent() - textDescent()));
+        text("Igrac " + i + ":", (width - textWidth("Igrač 1:"))/2, height*0.3);
+        text("Ime: ", width*0.4, height/2);
+        text("Lijevo: ", width* 0.4, height/2 + 2*(textAscent() - textDescent()));
+        text("Desno: ", width* 0.4, height/2 + 4*(textAscent() - textDescent()));
         
         if(i == 1) {
             nameField.setText(playerOne.getName());
@@ -358,17 +350,12 @@ private void startGame() {
 
     initializePlayersOnStart();
 
-    playerOne.getListOfPassedPoints().clear();
-    playerTwo.getListOfPassedPoints().clear();
-    playerThree.getListOfPassedPoints().clear();
-    playerFour.getListOfPassedPoints().clear();
-
     startCounter = true;  
     drawSideBar();
     chooseBackgroundRandomly();
     image(currentBackground, 0, 0, 5*width/6, height);
     chooseTextureRandomly();
-    drawBackground();
+    drawTexture();
     fill(127, 0, 0);        
     startTime = millis();
     startInterval = secondsToStart;

@@ -3,7 +3,7 @@ import ddf.minim.*;
 import g4p_controls.*;
 import java.lang.reflect.Method;
 
-AudioPlayer crashSound, cheerSound, startSound, endCheerSound;
+AudioPlayer crashSound, cheerSound, startSound, endCheerSound, bgMusic, bgMusic2, bgMusic3, bgMusic4, currentBGMusic;
 Minim minim;//audio context
 
 Movie loadingVideo;
@@ -112,7 +112,11 @@ void setup() {
     cheerSound = minim.loadFile(dataPath("Sounds/cheer.mp3"));
     startSound = minim.loadFile(dataPath("Sounds/startMusic.mp3"));
     endCheerSound = minim.loadFile(dataPath("Sounds/endCheer.mp3"));    
- 
+    bgMusic = minim.loadFile(dataPath("Sounds/backgroundMusic.mp3"));
+    bgMusic2 = minim.loadFile(dataPath("Sounds/backgroundMusic2.mp3"));
+    bgMusic3 = minim.loadFile(dataPath("Sounds/backgroundMusic3.mp3"));
+    bgMusic4 = minim.loadFile(dataPath("Sounds/backgroundMusic4.mp3"));
+    
     //initialize boosters
     size = new Booster(0, 0, color(255, 255, 0));
     speed = new Booster(0, 0, color(0, 255, 255));
@@ -248,6 +252,10 @@ private void playSound(AudioPlayer sound) {
 */
 void mousePressed() {
     if(betweenRounds && overButton(11*width/12, height*0.85, width/20)) {  
+        currentBGMusic.rewind();
+        currentBGMusic.pause();
+        chooseBGMusicRandomly();
+        currentBGMusic.loop();
         betweenRounds = false;
         startCounter = true;  
         initializePlayersOnStart();

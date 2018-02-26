@@ -114,6 +114,19 @@ private void chooseBackgroundRandomly() {
     } 
 }
 
+private void chooseBGMusicRandomly() {
+  int backgroundMusic = (int)random(1, 4.99);
+    if(backgroundMusic == 1) {
+        currentBGMusic = bgMusic;
+    } else if(backgroundMusic == 2) {
+        currentBGMusic = bgMusic2;
+    } else if(backgroundMusic == 3) {
+        currentBGMusic = bgMusic3;
+    } else if(backgroundMusic == 4) {
+        currentBGMusic = bgMusic4;
+    } 
+}
+
 /*
 * Draws again button on side bar. Only called when round is over.
 */
@@ -361,6 +374,8 @@ private void drawScreenPlayer(int i) {
 
 private void startGame() {
     startSound.close();
+    chooseBGMusicRandomly();
+    currentBGMusic.loop();
     frontScreen = false;
 
     initializePlayersOnStart();

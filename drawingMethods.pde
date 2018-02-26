@@ -277,11 +277,12 @@ private void drawChoosePlayersScreen() {
     btn4Players.setLocalColor(3, color(0, 0, 255));
     
     textSize(width/35);
+    fill(80, 255, 0);
     textWidth = textWidth("Pravila: Upravljati svojom zmijicom i izgjegavati tragove koje ostavljaju druge zmijice.");
     float textHeight = textAscent() - textDescent();
     text("Pravila: Upravljati svojom zmijicom i izgjegavati tragove koje ostavljaju druge zmijice.", (width - textWidth)/2, height*0.85);
-    textWidth = textWidth("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi dodje do 10.");
-    text("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi dodje do 10.", (width - textWidth)/2, height*0.85 + 2*textHeight);
+    textWidth = textWidth("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi postigne 10 bodova.");
+    text("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi postigne 10 bodova.", (width - textWidth)/2, height*0.85 + 2*textHeight);
 }
 
 private void drawScreenPlayer(int i) {

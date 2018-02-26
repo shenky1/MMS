@@ -262,8 +262,8 @@ private void drawChoosePlayersScreen() {
     textFont(menuFontBold);
     fill(200, 0, 0);
     textSize(height/10);
-    float textWidth = textWidth("Odaberite broj igraca");
-    text("Odaberite broj igraca", (width - textWidth)/2, height/4);
+    float textWidth = textWidth("Odaberite broj igraca:");
+    text("Odaberite broj igraca:", (width - textWidth)/2, height/4);
     
     int buttonRadius = width/10;
     btn2Players = new GButton(this, width/2 - 2*buttonRadius, height/2, buttonRadius, buttonRadius, "2"); 
@@ -275,6 +275,13 @@ private void drawChoosePlayersScreen() {
     btn2Players.setLocalColor(3, color(0, 0, 255));
     btn3Players.setLocalColor(3, color(0, 0, 255));
     btn4Players.setLocalColor(3, color(0, 0, 255));
+    
+    textSize(width/35);
+    textWidth = textWidth("Pravila: Upravljati svojom zmijicom i izgjegavati tragove koje ostavljaju druge zmijice.");
+    float textHeight = textAscent() - textDescent();
+    text("Pravila: Upravljati svojom zmijicom i izgjegavati tragove koje ostavljaju druge zmijice.", (width - textWidth)/2, height*0.85);
+    textWidth = textWidth("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi dodje do 10.");
+    text("Pobjednik runde je igrac koji prezivi. Pobjednik igre je igrac koji prvi dodje do 10.", (width - textWidth)/2, height*0.85 + 2*textHeight);
 }
 
 private void drawScreenPlayer(int i) {

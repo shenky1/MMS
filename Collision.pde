@@ -128,8 +128,11 @@ private void announceRoundWinner(Player player) {
     playSound(cheerSound);
     startRound = false;
     
-    int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
-    player.setScore(player.getScore() + pointsWon);
+    if(player.isAlive()) {
+        int pointsWon = (int)pow(2, numOfPlayers - playersLeft - 1);
+        player.setScore(player.getScore() + pointsWon);
+        player.setAlive(false);
+    }
     
     drawSideBar();
     

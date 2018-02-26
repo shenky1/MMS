@@ -45,6 +45,13 @@ private void drawSideBar() {
     if(numOfPlayers == 4) {
         drawPlayerScore(playerFour, 9*textHeight);
     }
+    
+    if(startTimer > 0) {
+        fill(127, 0, 0);
+        text("Proteklo vrijeme (s): ", 6*width/7, height*0.12);
+        textHeight = textAscent() - textDescent();
+        text((millis() - startTimer)/1000, 6*width/7, height*0.12 + 2*textHeight);
+    }
 }
 
 /*

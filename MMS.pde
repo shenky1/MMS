@@ -33,6 +33,7 @@ ArrayList<Player> listOfPlayers;
 int secondsToStart = 3;
 int startInterval; // counter
 float startTime; // time calculated with millis() when button is pressed.. Used for countdown
+float startTimer;
 
 Booster speed, size, changeKeys;
 
@@ -213,6 +214,7 @@ private void startCountdown() {
         startCounter = false;
         drawTexture();
         startRound = true;
+        startTimer = millis();
         size.setStartInterval(3);
         speed.setStartInterval(3);
         changeKeys.setStartInterval(3);
@@ -251,6 +253,7 @@ void mousePressed() {
         initializePlayersOnStart();
         chooseBackgroundRandomly();
         image(currentBackground, 0, 0, 5*width/6, height);
+        startTimer = 0;
         drawSideBar();
         chooseTextureRandomly();
         drawTexture();
@@ -290,7 +293,7 @@ void mousePressed() {
     } else if(player1Screen && get(mouseX, mouseY) == color(255,255,0)) {
           newGame = true;
           player1Screen = false;
-          playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+          playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
           nameField.setVisible(false);
           btnLeft.setVisible(false);
           btnRight.setVisible(false);
@@ -298,42 +301,42 @@ void mousePressed() {
     } else if(player1Screen && get(mouseX, mouseY) == color(255,220,0)) {
          player2Screen = true;
          player1Screen = false;
-         playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerOne.setName(nameField.getText().isEmpty() ? "Igrac 1" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(2);
     } else if(player2Screen && get(mouseX, mouseY) == color(255,255,0)) {
          player2Screen = false;
          player1Screen = true;
-         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(1);
     } else if(player2Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
          player3Screen = true;
          player2Screen = false;
-         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(3);
     } else if(player3Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
          player3Screen = false;
          player2Screen = true;
-         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(2);
     } else if(player3Screen && get(mouseX, mouseY) == color(255, 220, 0)) {
          player4Screen = true;
          player3Screen = false;
-         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(4);
     } else if(player4Screen && get(mouseX, mouseY) == color(255, 255, 0)) {
          player3Screen = true;
          player4Screen = false;
-         playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+         playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
          drawScreenPlayer(3);
     } else if(!startRound && get(mouseX, mouseY) == color(255, 255, 1) ||  get(mouseX, mouseY) == color(200, 0, 1)) {
       if(player2Screen) {
-        playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playerTwo.setName(nameField.getText().isEmpty() ? "Igrac 2" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
         playVideo();
       } else if(player3Screen) {
-        playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playerThree.setName(nameField.getText().isEmpty() ? "Igrac 3" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
         playVideo(); 
       } else if(player4Screen) {
-        playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 8 ? nameField.getText().substring(0,8) : nameField.getText());
+        playerFour.setName(nameField.getText().isEmpty() ? "Igrac 4" : nameField.getText().length() > 9 ? nameField.getText().substring(0,9) : nameField.getText());
         playVideo();
       }
         nameField.setVisible(false);

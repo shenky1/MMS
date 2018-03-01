@@ -3,16 +3,17 @@ class Booster {
     private int y;
     private int startInterval;
     private int startTime;
+    private boolean shown;
     private boolean active;
     private color col;
     private Method task;
+    private Player collector;
   
     public Booster(int x, int y, color col) {
         this.x = x;
         this.y = y;
         this.startInterval = 3;
         this.startTime = millis();
-        this.active = false;
         this.col = col;
     }
   
@@ -48,13 +49,21 @@ class Booster {
         return startTime;
     }
     
+    public boolean getShown() {
+        return shown;
+    }
+    
+    public void setShown(boolean shown) {
+        this.shown = shown;
+    } 
+    
     public boolean getActive() {
         return active;
     }
     
     public void setActive(boolean active) {
         this.active = active;
-    }
+    } 
     
     public color getColor() {
         return col;
@@ -70,5 +79,13 @@ class Booster {
     
     public void setTask(Method task) {
         this.task = task;
+    }
+    
+    public Player getCollector() {
+        return collector;
+    }
+    
+    public void setCollector(Player collector) {
+        this.collector = collector;
     }
 }

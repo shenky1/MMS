@@ -208,5 +208,13 @@ class Player {
         left = right;
         right = changeKey;   
         keysChanged = !keysChanged;
+        if(leftPressed) {
+          leftPressed = false;
+          rightPressed = true;
+        }
+        if(rightPressed) {
+          rightPressed = false;
+          leftPressed = true;
+        }
     }
 }

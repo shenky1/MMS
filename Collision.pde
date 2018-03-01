@@ -107,13 +107,15 @@ private boolean hasCrashedIntoPlayer(color col) {
 }
 
 private void doBoosterTask(Booster booster, Player player) {
-     if(booster.getActive()) {
+     if(booster.getShown()) {
          try {
-             booster.getTask().invoke(this, player);
+             booster.getTask().invoke(this, player, booster);
+             booster.setActive(true);
          } catch(Exception e) {
            println(e.getMessage()); //<>//
          }
-         booster.setActive(false);
+         booster.setShown(false);
+         booster.setCollector(player);
          currentTexture.mask(mask1);
          image(currentTexture, booster.getX() - BOOSTER_SIZE, booster.getY() - BOOSTER_SIZE, 2*(BOOSTER_SIZE + 1), 2*(BOOSTER_SIZE + 1));      
      }
@@ -198,26 +200,40 @@ private void announceFinalWinner(Player player) {
     text(player.getName() + " je pobjednik!", 5*width/12 - textWidth/2, height/2);
     playSound(endCheerSound);
     endOfGame = true;
+    drawSideBar();
     noLoop();
 }
 
-public void makeAllPlayersFasterExcept(Player player) {
+public void makeAllPlayersFasterExcept(Player player, Booster booster) {
+    if(booster.getActive()) {
+        for(Player p : listOfPlayers) 
+            if(p != player) p.setSpeed(p.getSpeed() - 1);
+        booster.setActive(false);
+    } else {
+      for(Player p : listOfPlayers) 
+            if(p != player) p.setSpeed(p.getSpeed() + 1);
+    }
+}
+
+public void makeAllPlayersBiggerExcept(Player player, Booster booster) {
+  if(booster.getActive()) {
+        for(Player p : listOfPlayers) 
+            if(p != player) {
+                p.setX(int(p.getX() + 2 * cos(p.getDirection())));
+                p.setY(int(p.getY() + 2 * -sin(p.getDirection())));
+                p.setSize(2*p.getSize()/3);
+            }
+        booster.setActive(false);
+    } else {
+     for(Player p : listOfPlayers) 
+         if(p != player) p.setSize(3*p.getSize()/2);  
+     }
+}
+
+public void makeAllPlayersChangeKeysExcept(Player player, Booster booster) {
     for(Player p : listOfPlayers) 
-        if(p != player) p.setSpeed(p.getSpeed() + 1);
-}
-
-public void makeAllPlayersBiggerExcept(Player player) {
-     for(Player p : listOfPlayers) {
-         if(p != player) {
-             p.setSize(3*p.getSize()/2);
-         }
-     }
-}
-
-public void makeAllPlayersChangeKeysExcept(Player player) {
-     for(Player p : listOfPlayers) {
-         if(p != player) {
-             p.changeKeys();
-         }
-     }
+        if(p != player) p.changeKeys();
+    if(booster.getActive()) {
+        booster.setActive(false);
+    }
 }

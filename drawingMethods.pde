@@ -57,7 +57,7 @@ private void drawSideBar() {
         text((millis() - startTimer)/1000, 6*width/7, height*0.12 + 2*textHeight);
     } 
     
-    if(!betweenRounds) {
+    if(!betweenRounds && !endOfGame) {
         drawPauseButton();
     }
 }
@@ -171,12 +171,12 @@ private void drawPauseButton() {
 
 
 private void initializeBooster(Booster booster, String methodName) {
-    if(millis() - booster.getStartTime() > 1000 && booster.getStartInterval() > 0 && !booster.getActive()) {
+    if(millis() - booster.getStartTime() > 1000 && booster.getStartInterval() > 0 && !booster.getShown()) {
         booster.setStartTime(millis());
         booster.setStartInterval(booster.getStartInterval() - 1);
     }
         
-    if(booster.getStartInterval() == 0 && !booster.getActive()) {
+    if(booster.getStartInterval() == 0 && !booster.getShown()) {
         int x, y;
         do {
             float u = random(0, 1);
@@ -187,12 +187,19 @@ private void initializeBooster(Booster booster, String methodName) {
         } while(!available(5*width/12 + x, height/2 + y));
         booster.setX(5*width/12 + x);
         booster.setY(height/2 + y);
-        booster.setActive(true);
-        booster.setStartInterval(8);
+        booster.setShown(true);
+        booster.setStartInterval(6);
         try {
-            booster.setTask(MMS.class.getMethod(methodName, Player.class));
+            booster.setTask(MMS.class.getMethod(methodName, Player.class, Booster.class));
         } catch(NoSuchMethodException e) {
           println(e.getMessage()); //<>//
+        }
+         try {
+           if(booster.getCollector() != null) {
+               booster.getTask().invoke(this, booster.getCollector(), booster);
+           }
+        } catch (Exception e) {
+            println(e.getMessage());
         }
     }     
 }

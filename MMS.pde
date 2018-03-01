@@ -47,7 +47,7 @@ GButton btn2Players, btn3Players, btn4Players;
 void setup() {
    // size(900,600);
     fullScreen();
-    frameRate(20);
+    frameRate(15);
     
     //set modes for drawing
     rectMode(CORNERS);
@@ -117,7 +117,7 @@ void setup() {
     crashSound = minim.loadFile(dataPath("Sounds/crash.mp3"));
     cheerSound = minim.loadFile(dataPath("Sounds/cheer.mp3"));
     startSound = minim.loadFile(dataPath("Sounds/startMusic.mp3"));
-    endCheerSound = minim.loadFile(dataPath("Sounds/endCheer.mp3"));    
+    endCheerSound = minim.loadFile(dataPath("Sounds/endCheer.mp3"));  
     bgMusic = minim.loadFile(dataPath("Sounds/backgroundMusic.mp3"));
     bgMusic2 = minim.loadFile(dataPath("Sounds/backgroundMusic2.mp3"));
     bgMusic3 = minim.loadFile(dataPath("Sounds/backgroundMusic3.mp3"));
@@ -182,15 +182,15 @@ void draw() {
           }
           
           if(!endOfGame) {
-              if(speed.getActive()) {
+              if(speed.getShown()) {
                 drawBooster(speed); //<>//
               }
               
-              if(size.getActive()) {
+              if(size.getShown()) {
                 drawBooster(size);
               }
               
-              if(changeKeys.getActive()) {
+              if(changeKeys.getShown()) {
                 drawBooster(changeKeys);
               }
           }
@@ -273,17 +273,25 @@ void mousePressed() {
         drawTexture();
         startInterval = secondsToStart;
         fill(127, 0, 0);
-        text(str(startInterval), 5*width/12, (height - textWidth("3"))/2);    
-        startTime = millis();
-        speed.setActive(false);
+        text(str(startInterval), 5*width/12, (height - textWidth("3"))/2);   
         size.setActive(false);
+        speed.setActive(false);
         changeKeys.setActive(false);
+        size.setCollector(null);
+        speed.setCollector(null);
+        changeKeys.setCollector(null);
+        startTime = millis();
+        speed.setShown(false);
+        size.setShown(false);
+        changeKeys.setShown(false);
         for(Player p : listOfPlayers) {
             p.setSpeed(1);
             p.setSize(4);
             if(p.isKeysChanged()) {
                 p.changeKeys();   
             }
+            p.setLeftPressed(false);
+            p.setRightPressed(false);
         }
     } else if(startRound && overButton(11*width/12, height*0.85, width/20)) {
         if(paused) {
@@ -431,7 +439,7 @@ void keyReleased() {
     if(!frontScreen) {
         for(Player player : listOfPlayers) {
             if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-                player.setLeftPressed(false);
+                    player.setLeftPressed(false);
             } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
                 player.setRightPressed(false);
             }

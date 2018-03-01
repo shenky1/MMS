@@ -16,7 +16,11 @@ private void drawSideBar() {
     textSize(height/30);
     fill(127, 0, 0);
     text("Izlaz: esc", 6*width/7, height/15);
-    
+    if(soundOn) {
+        image(sound, width*0.96, height/20, width*0.02, height*0.02);
+    } else {
+        image(noSound, width*0.96, height/20, width*0.02, height*0.02);
+    }
     text("Legenda:", 6*width/7, height/5);
     textSize(height/40);
     float textHeight = textAscent() - textDescent();
@@ -29,7 +33,7 @@ private void drawSideBar() {
     fill(changeKeys.getColor());
     drawStar(6*width/7, height/5 + 7*textHeight, 3, 8, 5);
     text(" Promjeni smjer", 6*width/7 + 10, height/5 + 7*textHeight + textHeight/2);
-
+    
     
     
     fill(127, 0, 0);
@@ -51,6 +55,10 @@ private void drawSideBar() {
         text("Proteklo vrijeme (s): ", 6*width/7, height*0.12);
         textHeight = textAscent() - textDescent();
         text((millis() - startTimer)/1000, 6*width/7, height*0.12 + 2*textHeight);
+    } 
+    
+    if(!betweenRounds) {
+        drawPauseButton();
     }
 }
 
@@ -131,17 +139,35 @@ private void chooseBGMusicRandomly() {
 * Draws again button on side bar. Only called when round is over.
 */
 private void drawAgainButton() {
-    textSize(height/30);
+    textSize(height/35);
     betweenRounds = true;
     float textHeight = textAscent() - textDescent();
-    float textWidth = textWidth("Nastavi!");
+    float textWidth = textWidth("Nova runda!");
     fill(0, 255, 0);
     strokeWeight(3);
     ellipse(11*width/12, height*0.85, textWidth*0.6, textWidth*0.6);
     strokeWeight(1);
     fill(127, 0, 0);
-    text("Nastavi!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
+    text("Nova runda!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
 }
+
+private void drawPauseButton() {
+    textSize(height/35);
+    float textHeight = textAscent() - textDescent();
+    float textWidth = textWidth("Nova runda!");
+    fill(0, 0, 255);
+    strokeWeight(3);
+    ellipse(11*width/12, height*0.85, textWidth*0.6, textWidth*0.6);
+    strokeWeight(1);
+    fill(255, 0, 0);
+    if(!paused) {
+        textWidth = textWidth("Pauziraj!");
+        text("Pauziraj!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
+    } else {
+       textWidth = textWidth("Nastavi!");
+       text("Nastavi!", 11*width/12 - textWidth/2, height*0.85 + textHeight/2);  
+    }
+}  
 
 
 private void initializeBooster(Booster booster, String methodName) {

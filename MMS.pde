@@ -11,15 +11,17 @@ int startVideo;
 boolean playVideo;
 
 PImage redBackground, xmasBackground, dirtyPaperBackground, symmetricalBackground, currentBackground, oilCanvas, blueStamp, redStamp, greenStamp,
-       purpleStamp, snowTexture, blackTexture, parquetTexture, brownTexture, yellowTexture, currentTexture, frontPageBackground, newGameBackground;
+       purpleStamp, snowTexture, blackTexture, parquetTexture, brownTexture, yellowTexture, currentTexture, frontPageBackground, newGameBackground,
+       sound, noSound;
 PGraphics mask1;
 
 PFont titleFont, menuFont, menuFontBold, normalFont;
 
-boolean startRound, startCounter, newGame, endOfGame, betweenRounds; // Any player reached numOfPointsToWin;
+boolean startRound, startCounter, newGame, endOfGame, betweenRounds, paused; // Any player reached numOfPointsToWin;
 boolean player1Screen, player2Screen, player3Screen, player4Screen;
 boolean frontScreen = true; // am I on front page 
 boolean menuDrawn = true;
+boolean soundOn = true;
 
 int numOfPlayers; // starting number of players
 int playersLeft; // how many players are alive at any time during the game
@@ -34,6 +36,7 @@ int secondsToStart = 3;
 int startInterval; // counter
 float startTime; // time calculated with millis() when button is pressed.. Used for countdown
 float startTimer;
+float timerWhenPaused;
 
 Booster speed, size, changeKeys;
 
@@ -67,6 +70,9 @@ void setup() {
     parquetTexture = loadImage(dataPath("Pictures/parquetTexture.jpg"));
     yellowTexture = loadImage(dataPath("Pictures/yellowTexture.jpg"));
     brownTexture = loadImage(dataPath("Pictures/brownTexture.jpg"));   
+    sound = loadImage(dataPath("Pictures/soundOn.png"));
+    noSound = loadImage(dataPath("Pictures/soundOff.png"));
+    
     
     //resize for masking (we want ellipse shape)
     snowTexture.resize(width, height);
@@ -279,6 +285,18 @@ void mousePressed() {
                 p.changeKeys();   
             }
         }
+    } else if(startRound && overButton(11*width/12, height*0.85, width/20)) {
+        if(paused) {
+          loop();
+          paused = false;
+          startTimer = millis() - timerWhenPaused;
+        }
+        else {
+          noLoop();
+          paused = true;
+          timerWhenPaused = millis() - startTimer;
+        }
+        drawSideBar();
     } else if(frontScreen) {
         checkIfMouseAboveMenu(); 
     } else if(newGame && get(mouseX, mouseY) == color(255,255,0)) {
@@ -350,6 +368,13 @@ void mousePressed() {
         nameField.setVisible(false);
         btnLeft.setVisible(false);
         btnRight.setVisible(false);
+    } else if((startRound || betweenRounds || startCounter) && overRect(int(width*0.96), int(height/20 + height*0.02), int(width*0.02), int(height*0.02))) {
+        if(soundOn) {
+            currentBGMusic.mute(); 
+        } else {
+            currentBGMusic.unmute();
+        }
+        soundOn = !soundOn;
     }
 }
 

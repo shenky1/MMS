@@ -47,7 +47,7 @@ GButton btn2Players, btn3Players, btn4Players;
 void setup() {
    // size(900,600);
     fullScreen();
-    frameRate(15);
+    frameRate(25);
     
     //set modes for drawing
     rectMode(CORNERS);

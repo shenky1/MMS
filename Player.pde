@@ -56,9 +56,6 @@ class Player {
     *  Tells us if keys were changed.
     */
     private boolean keysChanged;
-    
-    private boolean seen;
-
 
     /*
     * Constructor.
@@ -194,19 +191,8 @@ class Player {
        this.keysChanged = keysChanged;
        
     }
-    
-    public boolean getSeen() {
-        return seen;
-    }
-    
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
-    
-    public void changeKeys() {
-        int changeKey = left;
-        left = right;
-        right = changeKey;   
+   
+    public void changeKeys() {  
         keysChanged = !keysChanged;
         if(leftPressed) {
           leftPressed = false;

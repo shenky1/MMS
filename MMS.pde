@@ -163,6 +163,7 @@ void draw() {
     }
   
     if(startRound) {
+      if(!paused) {
         drawSideBar();
         for(Player p : listOfPlayers) 
             if(p.isAlive()) { 
@@ -180,7 +181,7 @@ void draw() {
           } catch(Exception e) {
               println(e.getMessage());      
           }
-          
+      }
           if(!endOfGame) {
               if(speed.getShown()) {
                 drawBooster(speed); //<>//
@@ -295,12 +296,10 @@ void mousePressed() {
         }
     } else if(startRound && overButton(11*width/12, height*0.85, width/20)) {
         if(paused) {
-          loop();
           paused = false;
           startTimer = millis() - timerWhenPaused;
         }
         else {
-          noLoop();
           paused = true;
           timerWhenPaused = millis() - startTimer;
         }
@@ -383,6 +382,7 @@ void mousePressed() {
             currentBGMusic.unmute();
         }
         soundOn = !soundOn;
+        drawSideBar();
     }
 }
 
@@ -409,9 +409,17 @@ void keyPressed() {
     if(startRound) {
         for(Player player : listOfPlayers) {
             if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
-                player.setLeftPressed(true);
+              if(player.isKeysChanged()) {  
+                  player.setRightPressed(true);
+              } else {
+                  player.setLeftPressed(true);
+              }
             } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-                player.setRightPressed(true);
+                if(player.isKeysChanged()) {  
+                    player.setLeftPressed(true);
+                } else {
+                    player.setRightPressed(true);
+                }
             }
         }
     } else {
@@ -439,9 +447,17 @@ void keyReleased() {
     if(!frontScreen) {
         for(Player player : listOfPlayers) {
             if(key == player.getLeft() || key == Character.toLowerCase(player.getLeft()) || keyCode == player.getLeft() || keyCode  == Character.toLowerCase(player.getLeft())) {
+                if(player.isKeysChanged()) {  
+                    player.setRightPressed(false);
+                } else {
                     player.setLeftPressed(false);
+                }
             } else if (key == player.getRight() || key == Character.toLowerCase(player.getRight()) || keyCode == player.getRight() || keyCode  == Character.toLowerCase(player.getRight())) {
-                player.setRightPressed(false);
+                if(player.isKeysChanged()) {  
+                  player.setLeftPressed(false);
+              } else {
+                  player.setRightPressed(false);
+              }
             }
          }
     } 

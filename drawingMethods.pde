@@ -54,7 +54,11 @@ private void drawSideBar() {
         fill(127, 0, 0);
         text("Proteklo vrijeme (s): ", 6*width/7, height*0.12);
         textHeight = textAscent() - textDescent();
-        text((millis() - startTimer)/1000, 6*width/7, height*0.12 + 2*textHeight);
+        if(paused) {
+            text(timerWhenPaused/1000, 6*width/7, height*0.12 + 2*textHeight);
+        } else {
+            text((millis() - startTimer)/1000, 6*width/7, height*0.12 + 2*textHeight);
+        }
     } 
     
     if(!betweenRounds && !endOfGame) {
@@ -206,7 +210,7 @@ private void initializeBooster(Booster booster, String methodName) {
 
 private boolean available(int x, int y) {
     for (int i = x - 10; i <= x + 10; i++) {
-        for (int j = y - 10; j < y + 10; j++) {
+        for (int j = y - 10; j <= y + 10; j++) {
             color c = get(i, j);
             if(hasCrashedIntoPlayer(c) 
             || c == size.getColor() || c == speed.getColor()

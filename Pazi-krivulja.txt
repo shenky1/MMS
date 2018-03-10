@@ -1,0 +1,44 @@
+﻿Pazi, krivulja!
+
+Preduvjeti za pokretanje igre:
+	Kako bi se igra mogla pokrenuti, potrebno je skinuti sljedeća 3 library-a (processing.video, ddf.minim, g4p_controls)
+
+"Pazi, krivulja!" je igra za 2 - 4 igrača koja se igra na jednom kompjuteru.
+Svaki igrač upravlja svojom zmijom koristeći dvije tipke, "skreći lijevo" i "skreći desno".
+Sve se događa na jednom ekranu. Igrač upravlja jednom zmijom koja ostavlja trag koji ostaje trajno na ekranu. (Svaka zmija je određena jednom bojom, npr. crvenom)
+
+Cijeli program se odvija u fullscreen mode-u. 
+Prije početka igre moguće je podesiti broj igrača te tipke i ime pojedinog igrača. 
+Nije moguće mijenjanje tipke u neku tipku koja je već zauzeta.
+
+Igra se sastoji od više rundi:
+	Svaka runda započinje nasumičnim postavljanjem pozicija zmijica i njihovog trenutnog smjera kretanja. Također se prilikom početka runde nasumično postavlja pozadina te melodija koja će svirati u pozadini.
+	U toj rundi svakom igraču je cilj ostati zadnja "živa" zmija na ekranu, zmija nije "živa" ako se sudari sa tragom koji je neka zmija već ostavila, uključujući i trag koji je ona sama ostavila.
+	U tom trenutku kretanje te zmije se zamrzne i igrač koji je upravljao tom zmijom mora čekati početak iduće runde.
+	Također je moguće skupljati zvjezdice na ekranu kojima igrač nastoji otežati protivničkim zmijama kretanje. (zvjezdice se okreću) 
+	Zvjezdice se prvi put pojave 3 sekunde nakon početka igre, a nakon što se neka sakupi, nestane na 6 sekundi te se ponovno stvori na nasumičnoj lokaciji (ako je to moguće). 
+	Zvjezdice rade sljedeće:
+		1. Ubrzaj ostale igrače na 6 sekundi.
+		2. Podebljaj ostale igrače na 6 sekundi.
+		3. Promijeni tipke igraču, ono što je bilo "skreći desno" je sada "skreći lijevo", a ono što je bilo "skreći lijevo" je sada "skreći desno".
+6 sekundi nakon što je neka zvjezdica bila sakupljena, neutralizira se njezin učinak.
+Dio ekrana po kojem se mogu kretati zmije je u obliku elipse. (elipsa se nalazi na lijevom dijelu ekrana) Ako se neki igrač sudari s nekim dijelom elipse, neće izgubiti život, 
+nego će se stvoriti na suprotnom dijelu elipse od onog s kojim se sudario. (ovisno o smjeru ulaza u zid)
+Na desnom dijelu ekrana se nalazi dio gdje pišu imena i bodovi igrača, gumb za pauziranje igre, gumb za uključivanje/isključivanje zvukova, štoperica koja opisuje trajanje trenutne runde te legenda koja govori
+što radi određena zvjezdica.
+
+Sustav bodovanja za svaku rundu je sljedeći:
+	Zmija koja je prva izgubila dobije 0 bodova.
+	Zmija koja je druga izgubila dobije 2^0 = 1 bodova.
+	Zmija koja je treća izgubila dobije 2^1 = 2 bodova.
+	Zmija koja je četvrta izgubila dobije 2^2 = 4 bodova.
+	
+Ako je neki igrač skupio 10 bodova, igra završava, inače počinje nova runda ispočetka. Na kraju runde prikazuje se slika winner koja je jednake boje kao boja igrača koji je zadnji ostao na ekranu. 
+Na kraju igre se elipsa popuni bojom koja je jednake boje kao boja igrača koji je skupio najveći broj bodova.
+Bitno je napomenuti da ukoliko igru igraju samo dva igrača, maksimalan broj bodova koji neki igrač može skupiti u pojedinoj rundi je 1 bod, dok ako igru igraju 4 igrača maksimalan broj bodova u pojedinoj rundi je 4.
+
+Neke stvari koje bi se mogle popraviti:
+	- Mogla bi se dodati slova sa dijakritičkim znakovima, trenutno nisu podržana.
+	- Nakon pritiska tipke ESC, zapamtiti stanje, trenutno se samo izađe iz programa.
+	- Odvojiti imena pozadinskih slika u neki .txt dokument, na taj način bi se lako mogle dodavati nova pozadinske slike.
+	- Odvojiti imena melodija u neki .txt dokument, na taj način bi se lako mogle dodavati nove melodije.
